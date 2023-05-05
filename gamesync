@@ -1,1 +1,32 @@
 #!/usr/bin/env bash
+
+# shellcheck disable=SC2145
+# shellcheck disable=SC2068
+
+set -e -o pipefail
+
+# Start the progress dialog and loop through some actions
+(
+  for i in {1..10}; do
+    # Simulate some work being done
+    sleep 1
+
+    # Update the progress dialog with the current value
+    echo "$((i * 10))"
+  done
+) | yad \
+    --title='My Progress Dialog' \
+    --text='Please wait...' \
+    --progress \
+    --auto-close \
+    --width=500 \
+    --window-icon=icons/hourglass.png \
+    --undecorated \
+    --skip-taskbar \
+    --keep-toplevel
+
+set +e +o pipefail
+
+echo "Executing" >> ~/.local/share/gamesync/log.log
+
+exec echo "$($@ && echo 'Done')"
