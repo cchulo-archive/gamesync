@@ -5,6 +5,10 @@
 
 set -e -o pipefail
 
+source /usr/local/bin/gamesync-utilities
+
+width=500
+
 # Start the progress dialog and loop through some actions
 (
   for i in {1..10}; do
@@ -15,18 +19,18 @@ set -e -o pipefail
     echo "$((i * 10))"
   done
 ) | yad \
-    --title='My Progress Dialog' \
+    --title='GameSync' \
     --text='Please wait...' \
     --progress \
     --auto-close \
-    --width=500 \
+    --width=${width} \
     --window-icon=icons/hourglass.png \
     --undecorated \
     --skip-taskbar \
-    --keep-toplevel
+    --keep-toplevel >/dev/null 2>&1
 
 set +e +o pipefail
 
 echo "Executing" >> ~/.local/share/gamesync/log.log
 
-exec echo "$($@ && echo 'Done')"
+exec echo "$($@ ; echo 'Done')"
