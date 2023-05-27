@@ -1,1 +1,11 @@
 #!/usr/bin/env bash
+
+log() {
+  local content
+  local datetime
+  local log_line
+  content="$1"
+  datetime="$(date +'%Y-%m-%d %H:%M:%S')"
+  log_line="${datetime}|${content}"
+  echo "$log_line" >> ~/.local/share/gamesync/log.log
+}
