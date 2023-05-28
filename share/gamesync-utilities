@@ -9,7 +9,7 @@ check_syncthing() {
   local SYNCTHING_API="$1"
   local SYNCTHING_URL="$2"
   local SYNCTHING_FOLDER_ID="$3"
-  local TIMEOUT=15
+  local TIMEOUT=60
   local start_time
   start_time=$(date +%s)
   local endpoint

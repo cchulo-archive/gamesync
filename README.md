@@ -37,7 +37,9 @@ the games save folder.
 The script then waits for the game to exit. When the game exits, gamesync will update gamesync's saves folder with the
 updated save files, where Syncthing will automatically pick up the updates and synchronize all other clients automatically.
 
-### Why not just use Syncthing?
+If Syncthing is not running, the script will still launch the game, and sync game saves to/from ~/.local/share/gamesync/saves
+
+### Why not just use Syncthing by itself? Or heck, NextCloud?
 There are minor annoyances with Syncthing that I did not appreciate. The syntax for including/excluding directories/files
 is confusing, messy, and I can't just make syncthing synchronize all save files within ~/.steam/steam/compatdata folder
 without extensive trial and error. There was also the issue where if I deleted a game, this would delete the save game
@@ -48,6 +50,8 @@ much like steam cloud, without the need for third party GUI or the need for a de
 
 This is about the most lightweight application I can create without the need for fancy CLI tools.
 
+This may very well be NextCloud with extra steps, but ah well, it's a learning experience!
+
 ## Current Limitations
 - Obviously you cannot be running the same application on multiple machines with the same user
 - Only supports Syncthing (it's what I like using)
@@ -55,6 +59,7 @@ This is about the most lightweight application I can create without the need for
   feel free to open a PR if you would like another provider
   - The script needs to be further generalized/modularized to support additional providers easily, this was done in an
   afternoon, and I got it to do what I want it to
+- The way its designed means that you will have two copies of a save game on your computer
 
 ## Instructions
 - Download/Clone this repo
@@ -122,3 +127,25 @@ This is about the most lightweight application I can create without the need for
     ]
   }
   ```
+  - `games` array holds the list of all game definitions
+    - Each game has `steamAppId` and/or `executableName`
+    - `steamAppId` is what Steam uses to identify what game is running. It will be non-zero for steam games, 0 for
+    non-steam games. For non-steam games it is necessary to specify `steamAppId` to be 0.
+    - use `executableName` for non-steam games. It could be used for steam games, but executable names tend to be long
+    as steam will always feed the fully qualified name into %command%.
+    - `saveLocations` is an array can be used to detail what directories you would like to synchronize across different
+    computers
+      - `name`: alias that identifies the `saveLocation`. Must be the same across machines
+      - `sourceDirectory`: location of the save directory, this may vary from machine to machine
+      - `include`: an array of strings that can be used to pattern match files that should be included
+        - file names and paths are always relative to `sourceDirectory`
+        - syntax is the same as python's [fnmatch](https://docs.python.org/3/library/fnmatch.html)
+      - `exclude`: an array of strings that can be used to pattern match files that should be excluded
+        - file names and paths are always relative to `sourceDirectory`
+        - syntax is the same as python's [fnmatch](https://docs.python.org/3/library/fnmatch.html)
+
+## Planned Features
+- Package this project for distribution across different distros
+- Windows support
+- Modularize script to support other providers
+- Additional automation for setting up syncthing
