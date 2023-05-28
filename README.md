@@ -59,4 +59,66 @@ This is about the most lightweight application I can create without the need for
 ## Instructions
 - Download/Clone this repo
 - Run `./install.sh`
-- Configure 
+- Configure `~/.local/share/gamesync/gamesync.env`
+  - This is an environment variables file that will be loaded every time gamesync is launched
+  - At the minimum you need to set 3 variables:
+  ```
+  SYNCTHING_API=<SYNCTHING_API_KEY>
+  SYNCTHING_URL=<URL_TO_YOUR_SYNCTHING_INSTANCE>
+  SYNCTHING_FOLDER_ID=<SYNCTHING_FOLDER_ID>
+  ```
+  - `SYNCTHING_URL` is most likely `http://localhost:8384` (the default) unless you configured it on another endpoint
+    - This may be different on each machine you setup, depends how you have it configured
+  - `SYNCTHING_API` is an API key that is generated from within Syncthing web UI
+    - `Actions > Settings > General > API Key`, either copy and paste the one that is already there, or generate a new key
+    - This will be different on each machine you set up
+  - `SYNCTHING_FOLDER_ID` is the folder you create within Syncthing web UI, create folder and point it to 
+  ~/.local/share/gamesync/saves, and note the `Folder ID` that Syncthing generates.
+    - This will be the same on all machines you share this folder with.
+  - There are two additional environment variables you can set in `gamesync.env`:
+    - `GAMESYNC_DEBUG` if set to `true` will make `gamesync` log debug data to ~/.local/share/gamesync/logs
+    - `GAMESYNC_LOG_LEVEL` can be set to `NOTSET`, `DEBUG`, `INFO`, `WARN`, `ERROR`, or `FATAL`. If not specified it
+    defaults to `INFO`. Ignored if `GAMESYNC_DEBUG` is not defined.
+- Configure your games in `~/.local/share/gamesync/gamesync-settings.json`
+  - example:
+
+  ```json
+  {
+    "games": [
+      {
+        "steamAppId": 0,
+        "executableName": "emulationstation",
+        "saveLocations": [
+          {
+            "name": "retroarch",
+            "sourceDirectory": "~/.config/retroarch/saves"
+          }
+        ]
+      },
+      {
+        "steamAppId": 2310,
+        "saveLocations": [
+          {
+            "name": "quake",
+            "sourceDirectory": "~/.steam/steam/steamapps/compatdata/2310/pfx/drive_c/users/steamuser/Saved Games/Nightdive Studios/Quake",
+            "include": [
+              "*.sav"
+            ]
+          }
+        ]
+      },
+      {
+        "steamAppId": 524220,
+        "saveLocations": [
+          {
+            "name": "nier",
+            "sourceDirectory": "~/.steam/steam/steamapps/compatdata/524220/pfx/drive_c/users/steamuser/Documents/My Games/NieR_Automata",
+            "include": [
+              "SlotData_*.dat"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  ```
