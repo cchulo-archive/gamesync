@@ -28,6 +28,18 @@
           "sourceDirectory": "~/.local/share/dolphin-emu/GameSettings"
         }
       ]
+    },
+    {
+      "steamAppId": 2310,
+      "saveLocations": [
+        {
+          "name": "quake",
+          "sourceDirectory": "~/.steam/steam/steamapps/compatdata/2310/pfx/drive_c/users/steamuser/Saved Games/Nightdive Studios/Quake",
+          "include": [
+            "*.sav"
+          ]
+        }
+      ]
     }
   ]
 }
