@@ -20,6 +20,8 @@ check_syncthing() {
   local endpoint
   endpoint="${API_ADDRESS}/rest/db/completion?folder=${FOLDER_ID}"
 
+  log "Attempting to ping ${endpoint}"
+
   while true; do
     local response
     response=$(curl -s -H "X-API-Key: ${API_KEY}" -X GET "${endpoint}")
