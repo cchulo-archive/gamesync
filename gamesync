@@ -42,10 +42,20 @@ else
   log "Syncthing is up"
 fi
 
+/usr/local/share/gamesync/local_gamesync.py \
+  --steamAppId "${SteamAppId}" \
+  --executableName "${executableName}" \
+  --download
+
 set +e +o pipefail
 
 log "executing game!"
 
 eval 'env LD_PRELOAD="${LD_PRELOAD}" $@'
 
-log "done!"
+log "done! staging saves for upload..."
+
+/usr/local/share/gamesync/local_gamesync.py \
+  --steamAppId "${SteamAppId}" \
+  --executableName "${executableName}" \
+  --upload

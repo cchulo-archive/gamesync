@@ -15,10 +15,25 @@ def setup_logging():
     if debug == 'true':
         log_file = '~/.local/share/gamesync/logs/log.log'
 
+    gamesync_log_level = os.getenv('GAMESYNC_LOG_LEVEL', None)
+
+    if gamesync_log_level == "NOTSET":
+        log_level = logging.NOTSET
+    elif gamesync_log_level == "DEBUG":
+        log_level = logging.DEBUG
+    elif gamesync_log_level == "INFO" or gamesync_log_level is None:
+        log_level = logging.INFO
+    elif gamesync_log_level == "WARN":
+        log_level = logging.WARN
+    elif gamesync_log_level == "ERROR":
+        log_level = logging.ERROR
+    else:
+        log_level = logging.FATAL
+
     logging.basicConfig(
         filename=log_file,
-        format='%(asctime)s | PYTHON | %(message)s',
-        level=logging.NOTSET,
+        format='%(asctime)s | %(levelname)s | local_gamesync.py | %(message)s',
+        level=log_level,
         datefmt='%Y-%m-%d %H:%M:%S')
 
 
@@ -30,14 +45,14 @@ def synchronize_directories(source_dir, dest_dir, include_patterns=None, exclude
             dest_path = os.path.join(dest_dir, relative_path)
 
             if include_patterns:
-                matched_include = any(fnmatch.fnmatch(relative_path, pattern) for pattern in include_patterns)
                 logging.debug(f'Testing if {relative_path} is in include_patterns: {include_patterns}')
+                matched_include = any(fnmatch.fnmatch(relative_path, pattern) for pattern in include_patterns)
                 if not matched_include:
                     continue
 
             if exclude_patterns:
-                matched_exclude = any(fnmatch.fnmatch(relative_path, pattern) for pattern in exclude_patterns)
                 logging.debug(f'Testing if {relative_path} is in exclude_patterns: {include_patterns}')
+                matched_exclude = any(fnmatch.fnmatch(relative_path, pattern) for pattern in exclude_patterns)
                 if matched_exclude:
                     continue
 
@@ -74,7 +89,7 @@ def synchronize_saves(game, gamesync_folder_name, download):
             source = source_directory
             destination = gamesync_save_path
 
-        logging.debug(f'synchronizing from {source} to {destination}')
+        logging.info(f'Synchronizing from {source} to {destination}')
         synchronize_directories(source, destination, include, exclude)
 
 
@@ -99,11 +114,12 @@ def main():
         logging.error("Must either specify download or upload, but not both")
         sys.exit(1)
 
-    if steam_app_id is "0" and executable_name is None:
+    if steam_app_id == "0" and executable_name is None:
         logging.error("Must specify executableName if steamAppId is 0")
         sys.exit(2)
 
     gamesync_filepath = os.path.expanduser('~/.local/share/gamesync/gamesync-settings.json')
+    logging.info(f'Synchronizing saves using entries in {gamesync_filepath}')
     with open(gamesync_filepath, 'r') as file:
         file_contents = file.read()
         game_settings = json.loads(file_contents)
@@ -115,7 +131,7 @@ def main():
             name = executable_name
         if game is None:
             err_msg = f'Game with steam id {steam_app_id}'
-            if steam_app_id is "0":
+            if steam_app_id == "0":
                 err_msg += f' and executable name {executable_name}'
             err_msg += f' was not found in {gamesync_filepath}'
             logging.error(err_msg)
