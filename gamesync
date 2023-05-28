@@ -23,6 +23,8 @@ fi
 IFS=' ' read -ra commands <<< $@
 executableName="${commands[-1]}"
 
+log_info "curl: $(which curl)"
+
 log_info "Syncing saves before executing $@"
 
 # shellcheck disable=SC2154
@@ -31,8 +33,12 @@ log_info "Executable name: ${executableName}"
 
 log_info "Checking if syncthing is running..."
 
-check_syncthing "${SYNCTHING_API}" "${SYNCTHING_URL}" "${SYNCTHING_FOLDER_ID}"
+log_debug "Before LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
+
+LD_LIBRARY_PATH="" check_syncthing "${SYNCTHING_API}" "${SYNCTHING_URL}" "${SYNCTHING_FOLDER_ID}"
 syncthing_status=$?
+
+log_debug "After LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
 
 if [[ ! ${syncthing_status} = 0  ]]; then
   log_warning "Syncthing is not working, check the logs!"
@@ -53,7 +59,7 @@ set +e +o pipefail
 
 log_info "executing game!"
 
-eval 'env LD_PRELOAD="${LD_PRELOAD}" $@'
+eval "env LD_PRELOAD=\"${LD_PRELOAD}\" $@"
 
 log_info "done! Staging updated saves for upload..."
 

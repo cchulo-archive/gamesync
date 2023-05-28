@@ -19,6 +19,7 @@ This script is not meant to be used directly, instead the bash script gamesync w
 when appropriate.
 '''
 
+
 debug = os.getenv('GAMESYNC_DEBUG', None)
 log_file = None
 if debug == 'true':
@@ -52,7 +53,7 @@ logging.basicConfig(
 
 file_handler = logging.FileHandler(log_file)
 file_handler.setLevel(log_level)
-file_handler.setFormatter(logging.Formatter(log_format))
+file_handler.setFormatter(logging.Formatter(log_format, datefmt='%Y-%m-%d %H:%M:%S'))
 
 logger = logging.getLogger('')
 logger.addHandler(file_handler)
@@ -144,10 +145,11 @@ def main():
         file_contents = file.read()
         game_settings = json.loads(file_contents)
         if steam_app_id != "0":
-            game = next((game for game in game_settings['games'] if game['steamAppId'] == steam_app_id), None)
+            game = next((game for game in game_settings['games'] if f"{game['steamAppId']}" == steam_app_id), None)
             name = steam_app_id
         else:
-            game = next((game for game in game_settings['games'] if game['executableName'] == executable_name), None)
+            game = next((game for game in game_settings['games'] if ('executableName' in game) and
+                         game['executableName'] == executable_name), None)
             name = executable_name
         if game is None:
             err_msg = f'Game with steam id {steam_app_id}'

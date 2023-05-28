@@ -50,7 +50,7 @@ test_log_level() {
   local local_log_level
   get_log_level "${GAMESYNC_LOG_LEVEL}"
   global_log_level=$?
-  get_log_level $1
+  get_log_level "$1"
   local_log_level=$?
   if (( local_log_level >= global_log_level )); then
     return 0 # return true
