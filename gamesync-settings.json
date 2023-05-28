@@ -40,6 +40,18 @@
           ]
         }
       ]
+    },
+    {
+      "steamAppId": 524220,
+      "saveLocations": [
+        {
+          "name": "nier",
+          "sourceDirectory": "/home/cchulo/.steam/steam/steamapps/compatdata/524220/pfx/drive_c/users/steamuser/Documents/My Games/NieR_Automata",
+          "include": [
+            "SlotData_*.dat"
+          ]
+        }
+      ]
     }
   ]
 }
