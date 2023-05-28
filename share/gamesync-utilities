@@ -19,7 +19,12 @@ check_syncthing() {
 
   while true; do
     local response
-    response=$(/usr/bin/curl -s -H "X-API-Key: ${SYNCTHING_API}" -X GET "${endpoint}")
+    response=$(/usr/bin/curl -s -H "X-API-Key: ${SYNCTHING_API}" -X GET "${endpoint}" || echo "no connection")
+
+    if [[ ${response} = "no connection" ]]; then
+      log_fatal "Connection to ${endpoint} could not be established, is ${SYNCTHING_URL} correct?"
+      return 5
+    fi
 
     if [[ ${response} = "no such folder" ]]; then
       log_fatal "The SYNCTHING_FOLDER_ID ${SYNCTHING_FOLDER_ID} does not exist! Did you forget to set it up?"
