@@ -15,6 +15,13 @@
             "title/00010000/*/data/*",
             "shared2/menu/FaceLib/*"
           ]
+        },
+        {
+          "name": "gamecube",
+          "sourceDirectory": "~/.local/share/dolphin-emu/GC",
+          "exclude": [
+            "SRAM.raw"
+          ]
         }
       ]
     }
