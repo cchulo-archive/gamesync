@@ -5,12 +5,23 @@
 
 set -e -o pipefail
 
-source /usr/local/bin/gamesync-utilities
+source /usr/local/share/gamesync/gamesync-utilities
 
 log "Syncing saves before executing $@"
 
+log "Loading variables in ~/.gamesync"
+
+# Load environment variables from the file
+while IFS='=' read -r key value; do
+    export "$key"="$value"
+done < ~/.gamesync
+
 # shellcheck disable=SC2154
 log "Steam app id: ${SteamAppId}"
+
+if [[ -z ${SteamAppId} ]]; then
+  SteamAppId="0"
+fi
 
 log "Checking if syncthing is running"
 

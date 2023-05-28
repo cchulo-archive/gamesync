@@ -1,7 +1,7 @@
 {
   "Games": [
     {
-      "SteamAppId": "0",
+      "SteamAppId": 0,
       "Executable": "emulationstation",
       "SaveLocations": [
         {
