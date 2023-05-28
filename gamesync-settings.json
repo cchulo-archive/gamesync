@@ -1,0 +1,20 @@
+{
+  "Games": [
+    {
+      "SteamAppId": "0",
+      "Executable": "emulationstation",
+      "SaveLocations": [
+        {
+          "Directory": "~/.config/retroarch/saves"
+        },
+        {
+          "Directory": "~/.local/share/dolphin-emu/Wii",
+          "Include": [
+            "00010000/*/data",
+            "shared2/menu/FaceLib"
+          ]
+        }
+      ]
+    }
+  ]
+}

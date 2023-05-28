@@ -7,21 +7,14 @@ set -e -o pipefail
 
 source /usr/local/bin/gamesync-utilities
 
-log "Syncing saves before executing ${@}"
+log "Syncing saves before executing $@"
 
-echo "----START OF ENV VARIABLES----"
-printenv >> ~/.local/share/gamesync/log.log
-echo "----END OF ENV VARIABLES----"
+# shellcheck disable=SC2154
+log "Steam app id: ${SteamAppId}"
 
 log "Checking if syncthing is running"
 
-for i in {1..10}; do
-  # Simulate some work being done
-  sleep 1
-
-  # Update the progress dialog with the current value
-  log "$((i * 10))"
-done
+check_syncthing "${SYNCTHING_API}" "${SYNCTHING_URL}" "${SYNCTHING_FOLDER_ID}"
 
 log "Syncthing is up"
 
@@ -29,6 +22,6 @@ set +e +o pipefail
 
 log "executing game!"
 
-eval 'env LD_PRELOAD="${LD_PRELOAD}" "$@"'
+eval 'env LD_PRELOAD="${LD_PRELOAD}" $@'
 
 log "done!"
