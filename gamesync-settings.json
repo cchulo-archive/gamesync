@@ -5,10 +5,12 @@
       "executableName": "emulationstation",
       "saveLocations": [
         {
-          "directory": "~/.config/retroarch/saves"
+          "name": "retroarch",
+          "sourceDirectory": "~/.config/retroarch/saves"
         },
         {
-          "directory": "~/.local/share/dolphin-emu/Wii",
+          "name": "wii",
+          "sourceDirectory": "~/.local/share/dolphin-emu/Wii",
           "include": [
             "00010000/*/data",
             "shared2/menu/FaceLib"

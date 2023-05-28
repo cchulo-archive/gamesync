@@ -5,6 +5,8 @@ import logging
 import argparse
 import json
 import sys
+import fnmatch
+import shutil
 
 
 def setup_logging():
@@ -20,12 +22,59 @@ def setup_logging():
         datefmt='%Y-%m-%d %H:%M:%S')
 
 
-def synchronize_saves(game, download):
-    if download:
-        logging.info(f'Download for {json.dumps(game, indent=4)}')
-    else:
-        logging.info(f'Upload for {json.dumps(game, indent=4)}')
-    pass
+def synchronize_directories(source_dir, dest_dir, include_patterns=None, exclude_patterns=None):
+    for root, dirs, files in os.walk(source_dir):
+        logging.debug(f'Root is {root}')
+        for directory in dirs:
+            logging.debug(f'directory {directory}')
+        for filename in files:
+            logging.debug(f'file {filename}')
+            source_path = os.path.join(root, filename)
+            relative_path = os.path.relpath(source_path, source_dir)
+            dest_path = os.path.join(dest_dir, relative_path)
+
+            if include_patterns:
+                matched_include = any(fnmatch.fnmatch(filename, pattern) for pattern in include_patterns)
+                if not matched_include:
+                    continue
+
+            if exclude_patterns:
+                matched_exclude = any(fnmatch.fnmatch(filename, pattern) for pattern in exclude_patterns)
+                if matched_exclude:
+                    continue
+
+            if not os.path.exists(dest_path) or os.path.getmtime(source_path) > os.path.getmtime(dest_path):
+                # shutil.copy2(source_path, dest_path)
+                logging.info(f"Copied {source_path} to {dest_path}")
+
+
+def synchronize_saves(game, gamesync_folder_name, download):
+    gamesync_directory = os.path.expanduser(f'~/.local/share/gamesync/saves/{gamesync_folder_name}')
+    save_locations = game['saveLocations']
+    for saveLocation in save_locations:
+        save_location_name = saveLocation['name']
+        source_directory = saveLocation['sourceDirectory']
+        include = None if 'include' not in saveLocation else saveLocation['include']
+        exclude = None if 'exclude' not in saveLocation else saveLocation['exclude']
+
+        logging.debug(f'Save location name {save_location_name}')
+        logging.debug(f'Source directory {source_directory}')
+        logging.debug(f'Include {include}')
+        logging.debug(f'Exclude {exclude}')
+
+        gamesync_save_path = os.path.join(gamesync_directory, save_location_name)
+        if not os.path.exists(gamesync_save_path):
+            os.makedirs(gamesync_save_path)
+
+        if download:
+            source = gamesync_save_path
+            destination = source_directory
+        else:
+            source = source_directory
+            destination = gamesync_save_path
+
+        logging.debug(f'synchronizing from {source} to {destination}')
+        synchronize_directories(source, destination, include, exclude)
 
 
 def main():
@@ -59,8 +108,10 @@ def main():
         game_settings = json.loads(file_contents)
         if steam_app_id != "0":
             game = next((game for game in game_settings['games'] if game['steamAppId'] == steam_app_id), None)
+            name = steam_app_id
         else:
             game = next((game for game in game_settings['games'] if game['executableName'] == executable_name), None)
+            name = executable_name
         if game is None:
             err_msg = f'Game with steam id {steam_app_id}'
             if steam_app_id is "0":
@@ -68,7 +119,7 @@ def main():
             err_msg += f' was not found in {gamesync_filepath}'
             logging.error(err_msg)
             sys.exit(3)
-        synchronize_saves(game, download)
+        synchronize_saves(game, name, download)
 
 
 if __name__ == "__main__":
