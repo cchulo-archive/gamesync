@@ -17,6 +17,8 @@ It even works outside of steam!
 ## Requirements
 - [Syncthing](https://syncthing.net/)
 - Python3
+- Only linux is supported for now
+  - This may work on MacOS, all you really need is bash and python3
 
 ## Instructions
 Simply wrap `gamesync` around command you wish to launch with quotes
@@ -147,5 +149,6 @@ This may very well be NextCloud with extra steps, but ah well, it's a learning e
 ## Planned Features
 - Package this project for distribution across different distros
 - Windows support
+  - Confirm MacOS support
 - Modularize script to support other providers
 - Additional automation for setting up syncthing
