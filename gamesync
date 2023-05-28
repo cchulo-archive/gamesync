@@ -3,6 +3,10 @@
 # shellcheck disable=SC2145
 # shellcheck disable=SC2068
 
+# source any dependencies
+source /usr/local/share/gamesync/gamesync-logging
+source /usr/local/share/gamesync/gamesync-utilities
+
 set -e -o pipefail
 
 # Load environment variables from the file
@@ -12,35 +16,33 @@ done < ~/.local/share/gamesync/gamesync.env
 
 # gamesync can be executed outside of steam, if so, assign SteamAppId to 0
 if [[ -z ${SteamAppId} ]]; then
+  log_debug "Assigning SteamAppId to 0, this can happen is gamesync is used outside of steam"
   SteamAppId="0"
 fi
 
 IFS=' ' read -ra commands <<< $@
 executableName="${commands[-1]}"
 
-# source any dependencies
-source /usr/local/share/gamesync/gamesync-utilities
-
-log "Syncing saves before executing $@"
-
-log "Loading variables in ~/.gamesync"
+log_info "Syncing saves before executing $@"
 
 # shellcheck disable=SC2154
-log "Steam app id: ${SteamAppId}"
-log "Executable name: ${executableName}"
+log_info "Steam app id: ${SteamAppId}"
+log_info "Executable name: ${executableName}"
 
-log "Checking if syncthing is running..."
+log_info "Checking if syncthing is running..."
 
 check_syncthing "${SYNCTHING_API}" "${SYNCTHING_URL}" "${SYNCTHING_FOLDER_ID}"
 syncthing_status=$?
 
 if [[ ! ${syncthing_status} = 0  ]]; then
-  log "Syncthing is not working, check the logs!"
-  log "Syncthing status code: ${syncthing_status}"
-  log "Continuing with synchronizing from ~/.local/share/gamesync/saves anyway"
+  log_warning "Syncthing is not working, check the logs!"
+  log_warning "Syncthing status code: ${syncthing_status}"
+  log_warning "Continuing with synchronizing from ~/.local/share/gamesync/saves anyway"
 else
-  log "Syncthing is up"
+  log_info "Syncthing is up"
 fi
+
+log_info "Downloading game saves from the staging area..."
 
 /usr/local/share/gamesync/local_gamesync.py \
   --steamAppId "${SteamAppId}" \
@@ -49,11 +51,11 @@ fi
 
 set +e +o pipefail
 
-log "executing game!"
+log_info "executing game!"
 
 eval 'env LD_PRELOAD="${LD_PRELOAD}" $@'
 
-log "done! staging saves for upload..."
+log_info "done! Staging updated saves for upload..."
 
 /usr/local/share/gamesync/local_gamesync.py \
   --steamAppId "${SteamAppId}" \

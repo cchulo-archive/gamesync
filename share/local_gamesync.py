@@ -7,6 +7,7 @@ import json
 import sys
 import fnmatch
 import shutil
+from datetime import date
 
 '''
 This script is used to stage directories specified in ~/.local/share/gamesync/gamesync-settings.json to
@@ -18,33 +19,43 @@ This script is not meant to be used directly, instead the bash script gamesync w
 when appropriate.
 '''
 
+debug = os.getenv('GAMESYNC_DEBUG', None)
+log_file = None
+if debug == 'true':
+    current_date = date.today()
+    formatted_date = current_date.strftime("%Y-%m-%d")
+    log_file = os.path.expanduser(f'~/.local/share/gamesync/logs/log.{formatted_date}.log')
 
-def setup_logging():
-    debug = os.getenv('GAMESYNC_DEBUG', None)
-    log_file = None
-    if debug == 'true':
-        log_file = '~/.local/share/gamesync/logs/log.log'
+gamesync_log_level = os.getenv('GAMESYNC_LOG_LEVEL', None)
 
-    gamesync_log_level = os.getenv('GAMESYNC_LOG_LEVEL', None)
+if gamesync_log_level == "NOTSET":
+    log_level = logging.NOTSET
+elif gamesync_log_level == "DEBUG":
+    log_level = logging.DEBUG
+elif gamesync_log_level == "INFO":
+    log_level = logging.INFO
+elif gamesync_log_level == "WARN":
+    log_level = logging.WARN
+elif gamesync_log_level == "ERROR":
+    log_level = logging.ERROR
+elif gamesync_log_level == "FATAL":
+    log_level = logging.FATAL
+else:
+    log_level = logging.INFO
 
-    if gamesync_log_level == "NOTSET":
-        log_level = logging.NOTSET
-    elif gamesync_log_level == "DEBUG":
-        log_level = logging.DEBUG
-    elif gamesync_log_level == "INFO" or gamesync_log_level is None:
-        log_level = logging.INFO
-    elif gamesync_log_level == "WARN":
-        log_level = logging.WARN
-    elif gamesync_log_level == "ERROR":
-        log_level = logging.ERROR
-    else:
-        log_level = logging.FATAL
+log_format = '%(asctime)s | %(levelname)s | local_gamesync.py | %(message)s'
 
-    logging.basicConfig(
-        filename=log_file,
-        format='%(asctime)s | %(levelname)s | local_gamesync.py | %(message)s',
-        level=log_level,
-        datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(
+    format=log_format,
+    level=log_level,
+    datefmt='%Y-%m-%d %H:%M:%S')
+
+file_handler = logging.FileHandler(log_file)
+file_handler.setLevel(log_level)
+file_handler.setFormatter(logging.Formatter(log_format))
+
+logger = logging.getLogger('')
+logger.addHandler(file_handler)
 
 
 def synchronize_directories(source_dir, dest_dir, include_patterns=None, exclude_patterns=None):
@@ -55,13 +66,13 @@ def synchronize_directories(source_dir, dest_dir, include_patterns=None, exclude
             dest_path = os.path.join(dest_dir, relative_path)
 
             if include_patterns:
-                logging.debug(f'Testing if {relative_path} is in include_patterns: {include_patterns}')
+                logger.debug(f'Testing if {relative_path} is in include_patterns: {include_patterns}')
                 matched_include = any(fnmatch.fnmatch(relative_path, pattern) for pattern in include_patterns)
                 if not matched_include:
                     continue
 
             if exclude_patterns:
-                logging.debug(f'Testing if {relative_path} is in exclude_patterns: {include_patterns}')
+                logger.debug(f'Testing if {relative_path} is in exclude_patterns: {include_patterns}')
                 matched_exclude = any(fnmatch.fnmatch(relative_path, pattern) for pattern in exclude_patterns)
                 if matched_exclude:
                     continue
@@ -69,9 +80,9 @@ def synchronize_directories(source_dir, dest_dir, include_patterns=None, exclude
             if not os.path.exists(dest_path) or os.path.getmtime(source_path) > os.path.getmtime(dest_path):
                 os.makedirs(os.path.dirname(dest_path), exist_ok=True)  # Create missing directories
                 shutil.copy2(source_path, dest_path)
-                logging.info(f"Copied {source_path} to {dest_path}")
+                logger.info(f"Copied {source_path} to {dest_path}")
             else:
-                logging.debug(f'file {dest_path} already up to date')
+                logger.debug(f'file {dest_path} already up to date')
 
 
 def synchronize_saves(game, gamesync_folder_name, download):
@@ -83,10 +94,10 @@ def synchronize_saves(game, gamesync_folder_name, download):
         include = None if 'include' not in saveLocation else saveLocation['include']
         exclude = None if 'exclude' not in saveLocation else saveLocation['exclude']
 
-        logging.debug(f'Save location name {save_location_name}')
-        logging.debug(f'Source directory {source_directory}')
-        logging.debug(f'Include {include}')
-        logging.debug(f'Exclude {exclude}')
+        logger.debug(f'Save location name {save_location_name}')
+        logger.debug(f'Source directory {source_directory}')
+        logger.debug(f'Include {include}')
+        logger.debug(f'Exclude {exclude}')
 
         gamesync_save_path = os.path.join(gamesync_directory, save_location_name)
         if not os.path.exists(gamesync_save_path):
@@ -99,12 +110,11 @@ def synchronize_saves(game, gamesync_folder_name, download):
             source = source_directory
             destination = gamesync_save_path
 
-        logging.info(f'Synchronizing from {source} to {destination}')
+        logger.info(f'Synchronizing from {source} to {destination}')
         synchronize_directories(source, destination, include, exclude)
 
 
 def main():
-    setup_logging()
     parser = argparse.ArgumentParser(description="Synchronize game files for steam or non-steam game")
     parser.add_argument("--steamAppId", required=True, help="The SteamAppId")
     parser.add_argument("--executableName", required=False, help="Used if SteamAppId is 0")
@@ -117,19 +127,19 @@ def main():
     download = args.download
     upload = args.upload
 
-    logging.info(f'SteamAppId: {steam_app_id}')
-    logging.info(f'Executable name: {executable_name}')
+    logger.info(f'SteamAppId: {steam_app_id}')
+    logger.info(f'Executable name: {executable_name}')
 
     if (download is True and upload is True) or (download is False and upload is False):
-        logging.error("Must either specify download or upload, but not both")
+        logger.error("Must either specify download or upload, but not both")
         sys.exit(1)
 
     if steam_app_id == "0" and executable_name is None:
-        logging.error("Must specify executableName if steamAppId is 0")
+        logger.error("Must specify executableName if steamAppId is 0")
         sys.exit(2)
 
     gamesync_filepath = os.path.expanduser('~/.local/share/gamesync/gamesync-settings.json')
-    logging.info(f'Synchronizing saves using entries in {gamesync_filepath}')
+    logger.info(f'Synchronizing saves using entries in {gamesync_filepath}')
     with open(gamesync_filepath, 'r') as file:
         file_contents = file.read()
         game_settings = json.loads(file_contents)
@@ -144,7 +154,7 @@ def main():
             if steam_app_id == "0":
                 err_msg += f' and executable name {executable_name}'
             err_msg += f' was not found in {gamesync_filepath}'
-            logging.error(err_msg)
+            logger.error(err_msg)
             sys.exit(3)
         synchronize_saves(game, name, download)
 

@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+# This file is not meant to be executed instead the bash script gamesync will source it
+# so it can make use of these functions at the appropriate times
+
+
+log() {
+  local log_level
+  local content
+  local datetime
+  local log_line
+  log_level="$1"
+  content="$2"
+  datetime="$(date +'%Y-%m-%d %H:%M:%S')"
+  datetime_short="$(date +'%Y-%m-%d')"
+  log_line="${datetime} | ${log_level} | gamesync | ${content}"
+  if [[ "${GAMESYNC_DEBUG}" = "true" ]]; then
+    echo "$log_line"
+    # shellcheck disable=SC2086
+    echo "$log_line" >> ~/.local/share/gamesync/logs/log.${datetime_short}.log
+  else
+    echo "$log_line"
+  fi
+}
+
+get_log_level() {
+  local log_level
+  log_level="$1"
+  if [[ -z ${log_level} ]]; then
+    return 20
+  elif [[ ${log_level} = "NOTSET" ]]; then
+    return 0
+  elif [[ ${log_level} = "DEBUG" ]]; then
+    return 10
+  elif [[ ${log_level} = "INFO" ]]; then
+    return 20
+  elif [[ ${log_level} = "WARN" ]]; then
+    return 30
+  elif [[ ${log_level} = "ERROR" ]]; then
+    return 40
+  elif [[ ${log_level} = "FATAL" ]]; then
+    return 50
+  else
+    return 20
+  fi
+}
+
+test_log_level() {
+  local global_log_level
+  local local_log_level
+  get_log_level "${GAMESYNC_LOG_LEVEL}"
+  global_log_level=$?
+  get_log_level $1
+  local_log_level=$?
+  if (( local_log_level >= global_log_level )); then
+    return 0 # return true
+  else
+    return 1 # return false
+  fi
+}
+
+log_helper() {
+  local log_level="$1"
+
+  if test_log_level "$1"; then
+    log "$1" "$2"
+  fi
+}
+
+log_debug() {
+  log_helper "DEBUG" "$1"
+}
+
+log_info() {
+  log_helper "INFO" "$1"
+}
+
+log_warn() {
+  log_helper "WARN" "$1"
+}
+
+log_error() {
+  log_helper "ERROR" "$1"
+}
+
+log_fatal() {
+  log_helper "FATAL" "$1"
+}
