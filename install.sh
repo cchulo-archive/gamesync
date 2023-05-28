@@ -8,5 +8,6 @@ sudo mkdir -p /usr/local/share/gamesync
 sudo cp share/* /usr/local/share/gamesync/
 mkdir -p ~/.local/share/gamesync/logs
 mkdir -p ~/.local/share/gamesync/saves
-touch ~/.gamesync
+cp gamesync-settings.json ~/.local/share/gamesync/
+touch ~/.local/share/gamesync/gamesync.env
 echo 'gamesync installed!'
