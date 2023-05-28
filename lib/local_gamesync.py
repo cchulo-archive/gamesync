@@ -10,8 +10,8 @@ import shutil
 from datetime import date
 
 '''
-This script is used to stage directories specified in ~/.local/share/gamesync/gamesync-settings.json to
-~/.local/share/gamesync/saves in order for syncthing to properly synchronize them
+This script is used to stage directories specified in ~/.local/lib/gamesync/gamesync-settings.json to
+~/.local/lib/gamesync/saves in order for syncthing to properly synchronize them
 
 IMPORTANT NOTE: This script does not check if syncthing is currently synchronizing! 
 
