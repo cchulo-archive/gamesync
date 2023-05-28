@@ -24,28 +24,29 @@ def setup_logging():
 
 def synchronize_directories(source_dir, dest_dir, include_patterns=None, exclude_patterns=None):
     for root, dirs, files in os.walk(source_dir):
-        logging.debug(f'Root is {root}')
-        for directory in dirs:
-            logging.debug(f'directory {directory}')
         for filename in files:
-            logging.debug(f'file {filename}')
             source_path = os.path.join(root, filename)
             relative_path = os.path.relpath(source_path, source_dir)
             dest_path = os.path.join(dest_dir, relative_path)
 
             if include_patterns:
-                matched_include = any(fnmatch.fnmatch(filename, pattern) for pattern in include_patterns)
+                matched_include = any(fnmatch.fnmatch(relative_path, pattern) for pattern in include_patterns)
+                logging.debug(f'Testing if {relative_path} is in include_patterns: {include_patterns}')
                 if not matched_include:
                     continue
 
             if exclude_patterns:
-                matched_exclude = any(fnmatch.fnmatch(filename, pattern) for pattern in exclude_patterns)
+                matched_exclude = any(fnmatch.fnmatch(relative_path, pattern) for pattern in exclude_patterns)
+                logging.debug(f'Testing if {relative_path} is in exclude_patterns: {include_patterns}')
                 if matched_exclude:
                     continue
 
             if not os.path.exists(dest_path) or os.path.getmtime(source_path) > os.path.getmtime(dest_path):
-                # shutil.copy2(source_path, dest_path)
+                os.makedirs(os.path.dirname(dest_path), exist_ok=True)  # Create missing directories
+                shutil.copy2(source_path, dest_path)
                 logging.info(f"Copied {source_path} to {dest_path}")
+            else:
+                logging.debug(f'file {dest_path} already up to date')
 
 
 def synchronize_saves(game, gamesync_folder_name, download):
@@ -53,7 +54,7 @@ def synchronize_saves(game, gamesync_folder_name, download):
     save_locations = game['saveLocations']
     for saveLocation in save_locations:
         save_location_name = saveLocation['name']
-        source_directory = saveLocation['sourceDirectory']
+        source_directory = os.path.expanduser(saveLocation['sourceDirectory'])
         include = None if 'include' not in saveLocation else saveLocation['include']
         exclude = None if 'exclude' not in saveLocation else saveLocation['exclude']
 

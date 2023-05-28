@@ -12,8 +12,8 @@
           "name": "wii",
           "sourceDirectory": "~/.local/share/dolphin-emu/Wii",
           "include": [
-            "00010000/*/data",
-            "shared2/menu/FaceLib"
+            "title/00010000/*/data/*",
+            "shared2/menu/FaceLib/*"
           ]
         }
       ]
