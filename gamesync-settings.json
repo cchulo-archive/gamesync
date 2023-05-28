@@ -22,6 +22,10 @@
           "exclude": [
             "SRAM.raw"
           ]
+        },
+        {
+          "name": "dolphin-gamesettings",
+          "sourceDirectory": "~/.local/share/dolphin-emu/GameSettings"
         }
       ]
     }
