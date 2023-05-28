@@ -25,9 +25,12 @@ fi
 
 log "Checking if syncthing is running"
 
-check_syncthing "${SYNCTHING_API}" "${SYNCTHING_URL}" "${SYNCTHING_FOLDER_ID}"
-
-log "Syncthing is up"
+if [[ ! $(check_syncthing "${SYNCTHING_API}" "${SYNCTHING_URL}" "${SYNCTHING_FOLDER_ID}") ]]; then
+  log "Syncthing is not working, check the logs!"
+  log "Continuing with synchronizing from ~/.local/share/gamesync/saves anyway"
+else
+  log "Syncthing is up"
+fi
 
 set +e +o pipefail
 
