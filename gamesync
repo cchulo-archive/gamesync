@@ -2,10 +2,21 @@
 
 # shellcheck disable=SC2145
 # shellcheck disable=SC2068
+# shellcheck disable=SC1090
+
+if [[ -f /usr/local/share/gamesync/gamesync-logging ]]; then
+  GAMESYNC_LOGGING="/usr/local/share/gamesync/gamesync-logging"
+  GAMESYNC_UTILITIES="/usr/local/share/gamesync/gamesync-utilities"
+  LOCAL_GAMESYNC="/usr/local/share/gamesync/local_gamesync.py"
+else
+  GAMESYNC_LOGGING="${HOME}/.local/share/gamesync/scripts/gamesync-logging"
+  GAMESYNC_UTILITIES="${HOME}/.local/share/gamesync/scripts/gamesync-utilities"
+  LOCAL_GAMESYNC="${HOME}/.local/share/gamesync/scripts/local_gamesync.py"
+fi
 
 # source any dependencies
-source /usr/local/share/gamesync/gamesync-logging
-source /usr/local/share/gamesync/gamesync-utilities
+source "${GAMESYNC_LOGGING}"
+source "${GAMESYNC_UTILITIES}"
 
 set -e -o pipefail
 
@@ -50,7 +61,7 @@ fi
 
 log_info "Downloading game saves from the staging area..."
 
-/usr/local/share/gamesync/local_gamesync.py \
+${LOCAL_GAMESYNC} \
   --steamAppId "${SteamAppId}" \
   --executableName "${executableName}" \
   --download
@@ -63,7 +74,7 @@ eval "env LD_PRELOAD=\"${LD_PRELOAD}\" $@"
 
 log_info "done! Staging updated saves for upload..."
 
-/usr/local/share/gamesync/local_gamesync.py \
+${LOCAL_GAMESYNC} \
   --steamAppId "${SteamAppId}" \
   --executableName "${executableName}" \
   --upload

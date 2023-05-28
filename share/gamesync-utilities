@@ -3,7 +3,15 @@
 # This file is not meant to be executed instead the bash script gamesync will source it
 # so it can make use of these functions at the appropriate times
 
-source /usr/local/share/gamesync/gamesync-logging
+# shellcheck disable=SC1090
+
+if [[ -f /usr/local/share/gamesync/gamesync-logging ]]; then
+  GAMESYNC_LOGGING="/usr/local/share/gamesync/gamesync-logging"
+else
+  GAMESYNC_LOGGING="${HOME}/.local/share/gamesync/scripts/gamesync-logging"
+fi
+
+source "${GAMESYNC_LOGGING}"
 
 check_syncthing() {
   local SYNCTHING_API="$1"
@@ -19,7 +27,7 @@ check_syncthing() {
 
   while true; do
     local response
-    response=$(/usr/bin/curl -s -H "X-API-Key: ${SYNCTHING_API}" -X GET "${endpoint}" || echo "no connection")
+    response=$(curl -s -H "X-API-Key: ${SYNCTHING_API}" -X GET "${endpoint}" || echo "no connection")
 
     if [[ ${response} = "no connection" ]]; then
       log_fatal "Connection to ${endpoint} could not be established, is ${SYNCTHING_URL} correct?"
