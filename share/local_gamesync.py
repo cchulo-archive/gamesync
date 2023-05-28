@@ -8,9 +8,19 @@ import sys
 import fnmatch
 import shutil
 
+'''
+This script is used to stage directories specified in ~/.local/share/gamesync/gamesync-settings.json to
+~/.local/share/gamesync/saves in order for syncthing to properly synchronize them
+
+IMPORTANT NOTE: This script does not check if syncthing is currently synchronizing! 
+
+This script is not meant to be used directly, instead the bash script gamesync will invoke this python script
+when appropriate.
+'''
+
 
 def setup_logging():
-    debug = os.getenv('GAMESYNC_DEBUG')
+    debug = os.getenv('GAMESYNC_DEBUG', None)
     log_file = None
     if debug == 'true':
         log_file = '~/.local/share/gamesync/logs/log.log'
