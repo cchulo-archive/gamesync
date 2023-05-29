@@ -5,4 +5,4 @@ destination="${HOME}/.local/share/gamesync/.default-settings.json"
 
 echo "Updating ${destination}..."
 
-curl -o "${destination}" -L -C - "${file_url}"
+curl "${file_url}" > "${destination}"
