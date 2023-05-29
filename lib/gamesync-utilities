@@ -13,6 +13,12 @@ fi
 
 source "${GAMESYNC_LOGGING}"
 
+export SYNCTHING_ERR_TIMEOUT=1
+export SYNCTHING_ERR_FETCH_STATUS=2
+export SYNCTHING_ERR_INVALID_API_KEY=3
+export SYNCTHING_ERR_FOLDER_NOT_EXIST=4
+export SYNCTHING_ERR_NO_CONNECTION=5
+
 check_syncthing() {
   local SYNCTHING_API="$1"
   local SYNCTHING_URL="$2"
@@ -31,12 +37,12 @@ check_syncthing() {
 
     if [[ ${response} = "no connection" ]]; then
       log_fatal "Connection to ${endpoint} could not be established, is ${SYNCTHING_URL} correct?"
-      return 5
+      return ${SYNCTHING_ERR_NO_CONNECTION}
     fi
 
     if [[ ${response} = "no such folder" ]]; then
       log_fatal "The SYNCTHING_FOLDER_ID ${SYNCTHING_FOLDER_ID} does not exist! Did you forget to set it up?"
-      return 4
+      return ${SYNCTHING_ERR_FOLDER_NOT_EXIST}
     fi
 
     local sync_status
@@ -44,12 +50,12 @@ check_syncthing() {
 
     if [[ -z "${sync_status}" ]]; then
       log_fatal "Error retrieving status from ${endpoint}"
-      return 2
+      return ${SYNCTHING_ERR_FETCH_STATUS}
     fi
 
     if [[ "${sync_status}" = "Not Authorized" ]]; then
       log_fatal "Invalid API key used"
-      return 3
+      return ${SYNCTHING_ERR_INVALID_API_KEY}
     fi
 
     if [ "${sync_status}" = "100" ]; then
@@ -62,7 +68,7 @@ check_syncthing() {
     local elapsed_time=$((current_time - start_time))
     if [ $elapsed_time -ge $TIMEOUT ]; then
       log_error "Timeout reached. Folder synchronization did not complete."
-      return 5
+      return ${SYNCTHING_ERR_TIMEOUT}
     fi
 
     sleep 1

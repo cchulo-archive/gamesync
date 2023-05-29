@@ -51,7 +51,10 @@ syncthing_status=$?
 
 log_debug "After LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
 
-if [[ ! ${syncthing_status} = 0  ]]; then
+if [[ "${syncthing_status}" = "${SYNCTHING_ERR_NO_CONNECTION}" ]]; then
+  log_error "Timed out waiting for for syncthing to synchronize, try again later"
+  exit "${SYNCTHING_ERR_NO_CONNECTION}"
+elif [[ ! "${syncthing_status}" = "0"  ]]; then
   log_warning "Syncthing is not working, check the logs!"
   log_warning "Syncthing status code: ${syncthing_status}"
   log_warning "Continuing with synchronizing from ~/.local/share/gamesync/saves anyway"

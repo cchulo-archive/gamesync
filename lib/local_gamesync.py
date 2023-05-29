@@ -115,6 +115,17 @@ def synchronize_saves(game, gamesync_folder_name, download):
         synchronize_directories(source, destination, include, exclude)
 
 
+def load_game_definition(game_settings, steam_app_id, executable_name):
+    if steam_app_id != "0":
+        game = next((game for game in game_settings['games'] if f"{game['steamAppId']}" == steam_app_id), None)
+        name = steam_app_id if game is not None and 'directoryName' not in game else game['directoryName']
+    else:
+        game = next((game for game in game_settings['games'] if ('executableName' in game) and
+                     game['executableName'] == executable_name), None)
+        name = executable_name if game is not None and 'directoryName' not in game else game['directoryName']
+    return game, name
+
+
 def main():
     parser = argparse.ArgumentParser(description="Synchronize game files for steam or non-steam game")
     parser.add_argument("--steamAppId", required=True, help="The SteamAppId")
@@ -141,16 +152,21 @@ def main():
 
     gamesync_filepath = os.path.expanduser('~/.local/share/gamesync/gamesync-settings.json')
     logger.info(f'Synchronizing saves using entries in {gamesync_filepath}')
+
     with open(gamesync_filepath, 'r') as file:
         file_contents = file.read()
         game_settings = json.loads(file_contents)
-        if steam_app_id != "0":
-            game = next((game for game in game_settings['games'] if f"{game['steamAppId']}" == steam_app_id), None)
-            name = steam_app_id
-        else:
-            game = next((game for game in game_settings['games'] if ('executableName' in game) and
-                         game['executableName'] == executable_name), None)
-            name = executable_name if game is not None and 'directoryName' not in game else game['directoryName']
+        game, name = load_game_definition(game_settings, steam_app_id, executable_name)
+
+        # if game is None, we need to check in gamesync-settings.default.json in case there is a default implementation
+        if game is None:
+            gamesync_default_filepath = os.path.expanduser('~/.local/share/gamesync/gamesync-settings.default.json')
+            with open(gamesync_default_filepath, 'r') as default_file:
+                default_file_contents = default_file.read()
+                default_game_settings = json.loads(default_file_contents)
+                game, name = load_game_definition(default_game_settings, steam_app_id, executable_name)
+
+        # if a game is still None, then it's not defined anywhere
         if game is None:
             err_msg = f'Game with steam id {steam_app_id}'
             if steam_app_id == "0":
