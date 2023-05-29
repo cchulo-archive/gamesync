@@ -34,7 +34,7 @@ if [[ ! -f ~/.local/share/gamesync/gamesync-settings.json ]]; then
   echo '[]' > ~/.local/share/gamesync/gamesync-settings.json
 fi
 
-cp gamesync-settings.default.json ~/.local/share/gamesync/
+cp .default-settings.json ~/.local/share/gamesync/
 
 if [[ ! -f ~/.local/share/gamesync/gamesync.env ]]; then
   echo "Creating ~/.local/share/gamesync/gamesync.env, be sure to populate this file!"

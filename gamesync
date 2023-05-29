@@ -22,7 +22,9 @@ set -e -o pipefail
 
 # Load environment variables from the file
 while IFS='=' read -r key value; do
+  if [[ -n ${key} ]]; then
     export "$key"="$value"
+  fi
 done < ~/.local/share/gamesync/gamesync.env
 
 # gamesync can be executed outside of steam, if so, assign SteamAppId to 0
