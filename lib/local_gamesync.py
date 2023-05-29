@@ -19,6 +19,9 @@ This script is not meant to be used directly, instead the bash script gamesync w
 when appropriate.
 '''
 
+LOCAL_GAMESYNC_ERR_NO_DOWNLOAD_UPLOAD_SPECIFIED = 20
+LOCAL_GAMESYNC_ERR_NO_STEAM_APP_ID_AND_OR_EXECUTABLE_NAME = 21
+LOCAL_GAMESYNC_ERR_NO_GAME_DEFINITION = 22
 
 debug = os.getenv('GAMESYNC_DEBUG', None)
 log_file = None
@@ -144,11 +147,11 @@ def main():
 
     if (download is True and upload is True) or (download is False and upload is False):
         logger.error("Must either specify download or upload, but not both")
-        sys.exit(1)
+        sys.exit(LOCAL_GAMESYNC_ERR_NO_DOWNLOAD_UPLOAD_SPECIFIED)
 
     if steam_app_id == "0" and executable_name is None:
         logger.error("Must specify executableName if steamAppId is 0")
-        sys.exit(2)
+        sys.exit(LOCAL_GAMESYNC_ERR_NO_STEAM_APP_ID_AND_OR_EXECUTABLE_NAME)
 
     gamesync_filepath = os.path.expanduser('~/.local/share/gamesync/gamesync-settings.json')
     logger.info(f'Synchronizing saves using entries in {gamesync_filepath}')
@@ -173,7 +176,7 @@ def main():
                 err_msg += f' and executable name {executable_name}'
             err_msg += f' was not found in {gamesync_filepath}'
             logger.error(err_msg)
-            sys.exit(3)
+            sys.exit(LOCAL_GAMESYNC_ERR_NO_GAME_DEFINITION)
         synchronize_saves(game, name, download)
 
 
