@@ -20,7 +20,7 @@ source "${GAMESYNC_UTILITIES}"
 
 set -e -o pipefail
 
-# Load environment variables from the file
+# Load environment variables from ~/.local/share/gamesync/gamesync.env
 while IFS='=' read -r key value; do
   if [[ -n ${key} ]]; then
     export "$key"="$value"
@@ -33,10 +33,9 @@ if [[ -z ${SteamAppId} ]]; then
   SteamAppId="0"
 fi
 
+# extract executable name
 IFS=' ' read -ra commands <<< $@
 executableName="${commands[-1]}"
-
-log_info "curl: $(which curl)"
 
 log_info "Syncing saves before executing $@"
 
@@ -56,6 +55,9 @@ log_debug "After LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
 if [[ "${syncthing_status}" = "${SYNCTHING_ERR_NO_CONNECTION}" ]]; then
   log_error "Timed out waiting for for syncthing to synchronize, try again later"
   exit "${SYNCTHING_ERR_NO_CONNECTION}"
+elif [[ "${syncthing_status}" = "${SYNCTHING_ERR_FETCH_STATUS}" ]]; then
+  log_error "Could not retrieve status from syncthing"
+  exit "${SYNCTHING_ERR_FETCH_STATUS}"
 elif [[ ! "${syncthing_status}" = "0"  ]]; then
   log_warning "Syncthing is not working, check the logs!"
   log_warning "Syncthing status code: ${syncthing_status}"
