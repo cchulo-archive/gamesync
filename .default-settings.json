@@ -70,6 +70,18 @@
           ]
         }
       ]
+    },
+    {
+      "steamAppId": 1817230,
+      "saveLocations": [
+        {
+          "name": "hifi-rush",
+          "sourceDirectory": "~/.steam/steam/steamapps/compatdata/1817230/pfx/drive_c/users/steamuser/Saved Games/TangoGameworks/Hi-Fi RUSH (STEAM)/Saved/SaveGames",
+          "exclude": [
+            "*.vdf"
+          ]
+        }
+      ]
     }
   ]
 }
