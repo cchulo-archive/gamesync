@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+file_url="https://raw.githubusercontent.com/cchulo/gamesync/main/.default-settings.json"
+destination="${HOME}/.local/share/gamesync/.default-settings.json"
+
+echo "Updating ${destination}..."
+
+curl -o "${destination}" -L -C - "${file_url}"

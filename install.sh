@@ -20,6 +20,7 @@ fi
 
 echo 'Installing gamesync'
 ${PERMISSION} cp gamesync ${BASE_BIN}
+${PERMISSION} cp gamesync-update-settings ${BASE_BIN}
 
 echo "Creating folders in ${BASE_LIB}"
 ${PERMISSION} mkdir -p ${BASE_LIB}/gamesync

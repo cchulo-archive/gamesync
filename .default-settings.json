@@ -1,6 +1,53 @@
 {
   "games": [
     {
+      "steamAppId": 108710,
+      "saveLocations": [
+        {
+          "name": "alan_wake",
+          "sourceDirectory": "~/.steam/steam/userdata/46669488/108710/remote",
+          "include": [
+            "*.aws"
+          ]
+        }
+      ]
+    },
+    {
+      "steamAppId": 19680,
+      "saveLocations": [
+        {
+          "name": "alice_madness_returns",
+          "sourceDirectory": "~/.steam/steam/steamapps/compatdata/19680/pfx/drive_c/users/steamuser/Documents/My Games/Alice Madness Returns/AliceGame/CheckPoint"
+        }
+      ]
+    },
+    {
+      "steamAppId": 22370,
+      "saveLocations": [
+        {
+          "name": "fallout3",
+          "sourceDirectory": "~/.steam/steam/steamapps/compatdata/22370/pfx/drive_c/users/steamuser/Documents/My Games/Fallout3/Saves",
+          "exclude": [
+            "*.vdf",
+            "*.bak"
+          ]
+        }
+      ]
+    },
+    {
+      "steamAppId": 22380,
+      "saveLocations": [
+        {
+          "name": "falloutNV",
+          "sourceDirectory": "~/.steam/steam/steamapps/compatdata/22380/pfx/drive_c/users/steamuser/Documents/My Games/FalloutNV/Saves",
+          "exclude": [
+            "*.vdf",
+            "*.bak"
+          ]
+        }
+      ]
+    },
+    {
       "steamAppId": 2310,
       "saveLocations": [
         {
