@@ -150,7 +150,7 @@ def main():
         else:
             game = next((game for game in game_settings['games'] if ('executableName' in game) and
                          game['executableName'] == executable_name), None)
-            name = executable_name
+            name = executable_name if game is not None and 'directoryName' not in game else game['directoryName']
         if game is None:
             err_msg = f'Game with steam id {steam_app_id}'
             if steam_app_id == "0":

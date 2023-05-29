@@ -8,7 +8,7 @@
 if [[ -f /usr/local/lib/gamesync/gamesync-logging ]]; then
   GAMESYNC_LOGGING="/usr/local/lib/gamesync/gamesync-logging"
 else
-  GAMESYNC_LOGGING="${HOME}/.local/lib/gamesync/scripts/gamesync-logging"
+  GAMESYNC_LOGGING="${HOME}/.local/lib/gamesync/gamesync-logging"
 fi
 
 source "${GAMESYNC_LOGGING}"
