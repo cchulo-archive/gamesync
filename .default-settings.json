@@ -17,7 +17,10 @@
       "saveLocations": [
         {
           "name": "alice_madness_returns",
-          "sourceDirectory": "~/.steam/steam/steamapps/compatdata/19680/pfx/drive_c/users/steamuser/Documents/My Games/Alice Madness Returns/AliceGame/CheckPoint"
+          "sourceDirectory": "~/.steam/steam/steamapps/compatdata/19680/pfx/drive_c/users/steamuser/Documents/My Games/Alice Madness Returns/AliceGame/CheckPoint",
+          "exclude": [
+            "*.CFG"
+          ]
         }
       ]
     },
