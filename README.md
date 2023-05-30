@@ -2,20 +2,21 @@
 
 ## Description
 
-Got tired of steam cloud synchronizing graphics settings, was getting annoying to switch from 
-my steam deck to my desktop. Worst yet, some of my favorite games are not supported. To top it off, non-steam games
-already lack cloud saves if they don't have their own third party launcher.
+Steam cloud unfortunately synchronizes graphics settings for some games, making it awkward to switch from 
+my steam deck to my desktop, and having to reset the settings. every. single. time.
 
-It's 2023, so here's my solution.
+Worst yet, some of my favorite games are not supported.
 
-Gamesync is a script wrapper for launching steam games and ensuring that the save files that are loaded are the latest
-it was able to grab from the cloud.
+To top it off, non-steam games already lack cloud saves for the most part unless the dev supports it through some
+third party launcher or service.
+
+So here's my solution.
+
+Gamesync is a script wrapper for launching steam games and ensuring that the saves that get loaded are the latest.
 
 It even works outside of steam!
 
-It's not perfect, there's the chance that if you're offline syncthing might not be able to grab the latest saves, and
-you could inadvertently overwrite save game on your other PC. Make sure to setup syncthing to backup all files with at
-least simple file versioning (see syncthing docs for how to do that).
+Note: It's not perfect. It works for me but may not work for you. See the limitations below.
 
 ## Requirements
 - [Syncthing](https://syncthing.net/) is running on your machine
@@ -55,10 +56,12 @@ If Syncthing is not running, the script will still launch the game, and sync gam
 `~/.local/share/gamesync/saves`
 
 ### Why not just use Syncthing by itself? Or heck, NextCloud?
-There are minor annoyances with Syncthing that I did not appreciate. The syntax for including/excluding 
-directories/files is confusing, messy, and I can't just make syncthing synchronize all save files within 
-`~/.steam/steam/compatdata` folder without extensive trial and error. It is unfortunate that not all steam games
-share a single Wine prefix, but this is the state of how things are right now on steam linux gaming.
+There are minor annoyances with Syncthing:
+
+The syntax for including/excluding directories/files is confusing, messy, and error-prone. As a result I couldn't
+just make syncthing synchronize all save files within `~/.steam/steam/compatdata` folder without extensive trial and 
+error. It is unfortunate that not all steam games share a single Wine prefix, but this is the state of how things are 
+right now on steam linux gaming.
 
 There was also the issue where if I deleted a game, the uninstaller would delete the save, which would make syncthing 
 delete the save everywhere.
@@ -66,21 +69,25 @@ delete the save everywhere.
 Nextcloud might make more sense to use in this case, but the other feature I wanted is the ability to sync games upon 
 launch, much like steam cloud, without the need for third party GUI or the need for a decky plugin.
 
-This is about the most lightweight application I can create without the need for fancy GUI or anything unnecessary polling
-in the background
-
 This may very well be NextCloud with extra steps, but meh, it works for me.
 
 ## Current Limitations
-- Obviously you cannot be running the same application on multiple machines with the same user
+- Obviously you cannot be running the same application on multiple machines with the same user, steam helps with this
+by disallowing two computers to run the same game on two computers while online, but can be an issue if offline and
+for non-steam games.
 - Only supports Syncthing (it's what I like using)
   - I may support NextCloud if I ever get around to it, it's unlikely I will support anything else,
   feel free to open a PR if you would like another provider
-  - The script needs to be further generalized/modularized to support additional providers easily, this was done in an
-  afternoon, and I got it to do what I want it to
-- The way its designed means that you will have two copies of a save game on your computer
+    - The script needs to be further generalized/modularized to support additional providers easily.
+    This script was done in an afternoon after all.
+- The way gamesync is designed means that you will have two copies of a save game on your computer, though I see this as
+a pro rather than a con personally.
+- If you're offline syncthing might not be able to grab the latest saves, and therefore gamesync will be grabbing out
+of date saves. Saving/exiting again, while syncthing is still offline, will cause syncthing to overwrite saves across
+all machines. It's just the way syncthing works. To help with this you should enable simple file versioning.
+See the Syncthing docs for how to enable this in the web UI.
 
-## Instructions
+## How to install
 - Download/Clone this repo
 - Execute `./install.sh` with the following options
   - If you are using Steam on desktop, just execute `./install.sh`
