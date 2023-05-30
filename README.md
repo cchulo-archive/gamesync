@@ -174,7 +174,7 @@ This may very well be NextCloud with extra steps, but meh, it works for me.
 
 If you would like to only upgrade `.default-settings.json` simply execute `gamesync-update-settings` from the CLI
 
-## List of supported steam games
+## List of out-of-the box supported steam games
 
 - [Alan Wake](https://store.steampowered.com/app/108710/Alan_Wake/)
 - [Alice Madness Returns](https://store.steampowered.com/app/19680/Alice_Madness_Returns/)
