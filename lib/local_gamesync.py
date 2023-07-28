@@ -25,10 +25,7 @@ LOCAL_GAMESYNC_ERR_NO_GAME_DEFINITION = 22
 
 debug = os.getenv('GAMESYNC_DEBUG', None)
 log_file = None
-if debug == 'true':
-    current_date = date.today()
-    formatted_date = current_date.strftime("%Y-%m-%d")
-    log_file = os.path.expanduser(f'~/.local/share/gamesync/logs/log.{formatted_date}.log')
+logger = logging.getLogger('')
 
 gamesync_log_level = os.getenv('GAMESYNC_LOG_LEVEL', None)
 
@@ -54,12 +51,13 @@ logging.basicConfig(
     level=log_level,
     datefmt='%Y-%m-%d %H:%M:%S')
 
-file_handler = logging.FileHandler(log_file)
-file_handler.setLevel(log_level)
-file_handler.setFormatter(logging.Formatter(log_format, datefmt='%Y-%m-%d %H:%M:%S'))
-
-logger = logging.getLogger('')
-logger.addHandler(file_handler)
+if debug == 'true':
+    current_date = date.today()
+    log_file = os.path.expanduser("~") + f'/.local/share/gamesync/logs/log.{current_date.strftime("%Y-%m-%d")}.log'
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setLevel(log_level)
+    file_handler.setFormatter(logging.Formatter(log_format, datefmt='%Y-%m-%d %H:%M:%S'))
+    logger.addHandler(file_handler)
 
 
 def synchronize_directories(source_dir, dest_dir, include_patterns=None, exclude_patterns=None):
@@ -156,6 +154,9 @@ def main():
     if steam_app_id == "0" and executable_name is None:
         logger.error("Must specify executableName if steamAppId is 0")
         sys.exit(LOCAL_GAMESYNC_ERR_NO_STEAM_APP_ID_AND_OR_EXECUTABLE_NAME)
+
+    # clean up executable name (in case its executed from terminal)
+    executable_name = executable_name if '/' not in executable_name else executable_name.split('/')[-1]
 
     gamesync_filepath = os.path.expanduser('~/.local/share/gamesync/gamesync-settings.json')
     logger.info(f'Synchronizing saves using entries in {gamesync_filepath}')
