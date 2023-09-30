@@ -116,8 +116,14 @@ def synchronize_saves(game, gamesync_folder_name, download):
         synchronize_directories(source, destination, include, exclude)
 
 
-def load_game_definition(game_settings, steam_app_id, executable_name):
-    if steam_app_id != "0":
+def load_game_definition(game_settings, steam_app_id, executable_name, alias):
+    if alias is not None:
+        game = next((game for game in game_settings['games'] if ('alias' in game) and
+                     game['alias'] == alias), None)
+        logger.debug(game)
+        name = game['directoryName'] if game is not None and 'directoryName' in game else executable_name
+        logger.debug(name)
+    elif steam_app_id != "0":
         game = next((game for game in game_settings['games'] if f"{game['steamAppId']}" == steam_app_id), None)
         logger.debug(game)
         name = game['directoryName'] if game is not None and 'directoryName' in game else steam_app_id
@@ -135,17 +141,20 @@ def main():
     parser = argparse.ArgumentParser(description="Synchronize game files for steam or non-steam game")
     parser.add_argument("--steamAppId", required=True, help="The SteamAppId")
     parser.add_argument("--executableName", required=False, help="Used if SteamAppId is 0")
+    parser.add_argument("--alias", required=False, help="Used if SteamAppId is 0 and the executableName is unusable")
     parser.add_argument("--download", action='store_true', required=False, help="Used to download game saves")
     parser.add_argument("--upload", action='store_true', required=False, help="Used to upload game saves")
     args = parser.parse_args()
 
     steam_app_id = args.steamAppId
     executable_name = args.executableName
+    alias = args.alias
     download = args.download
     upload = args.upload
 
     logger.info(f'SteamAppId: {steam_app_id}')
     logger.info(f'Executable name: {executable_name}')
+    logger.info(f'Alias: {alias}')
 
     if (download is True and upload is True) or (download is False and upload is False):
         logger.error("Must either specify download or upload, but not both")
@@ -164,7 +173,7 @@ def main():
     with open(gamesync_filepath, 'r') as file:
         file_contents = file.read()
         game_settings = json.loads(file_contents)
-        game, name = load_game_definition(game_settings, steam_app_id, executable_name)
+        game, name = load_game_definition(game_settings, steam_app_id, executable_name, alias)
 
         # if game is None, we need to check in .default-settings.json in case there is a default implementation
         if game is None:
@@ -173,13 +182,15 @@ def main():
             with open(gamesync_default_filepath, 'r') as default_file:
                 default_file_contents = default_file.read()
                 default_game_settings = json.loads(default_file_contents)
-                game, name = load_game_definition(default_game_settings, steam_app_id, executable_name)
+                game, name = load_game_definition(default_game_settings, steam_app_id, executable_name, alias)
 
         # if a game is still None, then it's not defined anywhere
         if game is None:
             err_msg = f'Game with steam id {steam_app_id}'
-            if steam_app_id == "0":
+            if steam_app_id == "0" and executable_name is not None:
                 err_msg += f' and executable name {executable_name}'
+            else:
+                err_msg += f' and alias name {alias}'
             err_msg += f' was not found in {gamesync_filepath}'
             logger.error(err_msg)
             sys.exit(LOCAL_GAMESYNC_ERR_NO_GAME_DEFINITION)
