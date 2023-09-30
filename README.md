@@ -45,7 +45,7 @@ Example:
 - `gamesync "emulationstation"`
 - `gamesync --alias emu -- emulationstation`
 - `gamesync "gamemoderun %command%"`
-- `gamesync "gamescope -H 1440 -h 1440 -r 60 -f -- gamemoderun %command%"`
+- `gamesync --alias my-alias "gamescope -H 1440 -h 1440 -r 60 -f -- gamemoderun %command%"`
 
 ### Note for the Steam Deck
 Even though ~/.local/bin is in the PATH, in gamemode it is unable to find `gamesync`, so please add launch options for
@@ -115,7 +115,7 @@ See the Syncthing docs for how to enable this in the web UI.
   SYNCTHING_FOLDER_ID=<SYNCTHING_FOLDER_ID>
   ```
   - `SYNCTHING_URL` is most likely `http://localhost:8384` (the default) unless you configured it on another endpoint
-    - This may be different on each machine you setup, depends how you have it configured
+    - This may be different on each machine you set up, depends on how you have it configured
   - `SYNCTHING_API` is an API key that is generated from within Syncthing web UI
     - `Actions > Settings > General > API Key`, either copy and paste the one that is already there, or generate a new key
     - This will be different on each machine you set up
@@ -204,7 +204,7 @@ If you would like to only upgrade `.default-settings.json` simply execute `games
 
 - [Alan Wake](https://store.steampowered.com/app/108710/Alan_Wake/)
   - not recommended to use gamesync with this title, as Alan Wake on steam has tight integration with steam cloud,
-  using gamesync can lead to corrupted saves. The reason this was implemented is because graphics settings are
+  using gamesync can lead to corrupted saves. The reason this was implemented is that graphics settings are
   synchronized across machines.
 - [Alice Madness Returns](https://store.steampowered.com/app/19680/Alice_Madness_Returns/)
 - [Fallout 3 GOTY Edition](https://store.steampowered.com/app/22370/Fallout_3_Game_of_the_Year_Edition/)
