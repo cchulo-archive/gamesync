@@ -18,9 +18,6 @@ fi
 source "${GAMESYNC_LOGGING}"
 source "${GAMESYNC_UTILITIES}"
 
-log_debug "Environment:"
-log_debug "$(env)"
-
 set -e -o pipefail
 
 # Load environment variables from ~/.local/share/gamesync/gamesync.env
@@ -29,6 +26,11 @@ while IFS='=' read -r key value; do
     export "$key"="$value"
   fi
 done < ~/.local/share/gamesync/gamesync.env
+
+# Logging starts working here
+
+log_debug "Environment:"
+log_debug "$(env)"
 
 # gamesync can be executed outside of steam, if so, assign SteamAppId to 0
 if [[ -z ${SteamAppId} ]]; then
