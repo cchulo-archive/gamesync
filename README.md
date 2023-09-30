@@ -97,6 +97,8 @@ a pro rather than a con personally.
 of date saves. Saving/exiting again, while syncthing is still offline, will cause syncthing to overwrite saves across
 all machines. It's just the way syncthing works. To help with this you should enable simple file versioning.
 See the Syncthing docs for how to enable this in the web UI.
+- (currently) only supports saves for a single player
+- (currently) only supports saves that are hosted on the home folder (~/.steam/steam/...)
 
 ## How to install
 - Download/Clone this repo
@@ -201,11 +203,15 @@ If you would like to only upgrade `.default-settings.json` simply execute `games
 ## List of out-of-the box supported steam games
 
 - [Alan Wake](https://store.steampowered.com/app/108710/Alan_Wake/)
+  - not recommended to use gamesync with this title, as Alan Wake on steam has tight integration with steam cloud,
+  using gamesync can lead to corrupted saves. The reason this was implemented is because graphics settings are
+  synchronized across machines.
 - [Alice Madness Returns](https://store.steampowered.com/app/19680/Alice_Madness_Returns/)
 - [Fallout 3 GOTY Edition](https://store.steampowered.com/app/22370/Fallout_3_Game_of_the_Year_Edition/)
 - [Fallout New Vegas](https://store.steampowered.com/app/22380/Fallout_New_Vegas/)
 - [Quake](https://store.steampowered.com/app/2310/Quake/)
-  - Only the 2021 Nightdive studios, the OG release supports steam cloud
+  - Only the 2021 Nightdive studios, ~~the OG release supports steam cloud~~ this has been fixed in the latest
+  update to Quake, so gamesync is optional now for this title
 - [Nier Automata](https://store.steampowered.com/app/524220/NieRAutomata/)
 - [Hi-Fi Rush](https://store.steampowered.com/app/1817230/HiFi_RUSH/)
 
@@ -218,3 +224,5 @@ support for your favorite titles
   - Confirm MacOS support
 - Modularize script to support other providers
 - Additional automation for setting up syncthing
+- support multiple steam users on a single account
+- support saves stored on separate `SteamLibrary` directories not located under ~/.steam/steam
