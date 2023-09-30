@@ -18,6 +18,9 @@ fi
 source "${GAMESYNC_LOGGING}"
 source "${GAMESYNC_UTILITIES}"
 
+log_debug "Environment:"
+log_debug "$(env)"
+
 set -e -o pipefail
 
 # Load environment variables from ~/.local/share/gamesync/gamesync.env
