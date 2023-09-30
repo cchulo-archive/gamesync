@@ -129,7 +129,7 @@ See the Syncthing docs for how to enable this in the web UI.
 - Configure your games in `~/.local/share/gamesync/gamesync-settings.json`
   - Note that some games are already configured out of the box via `.default-settings.json`, a list will be provided
   below. The only caveat is that gamesync assumes your saves are all under ~/.local/steam/steam/.
-  This is currently not configurable. You will need to override these game defintions in `gamesync-settings.json`
+  This is currently not configurable. You will need to override these game definitions in `gamesync-settings.json`
   - example:
 
   ```json
