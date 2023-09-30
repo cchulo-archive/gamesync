@@ -13,7 +13,7 @@ log() {
   content="$2"
   datetime="$(date +'%Y-%m-%d %H:%M:%S')"
   datetime_short="$(date +'%Y-%m-%d')"
-  log_line="${datetime} | ${log_level} | gamesync | ${content}"
+  log_line="${datetime} | ${log_level} | gamesync.py | ${content}"
   if [[ "${GAMESYNC_DEBUG}" = "true" ]]; then
     echo "$log_line"
     # shellcheck disable=SC2086

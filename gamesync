@@ -7,11 +7,11 @@
 if [[ -f /usr/local/lib/gamesync/gamesync-logging ]]; then
   GAMESYNC_LOGGING="/usr/local/lib/gamesync/gamesync-logging"
   GAMESYNC_UTILITIES="/usr/local/lib/gamesync/gamesync-utilities"
-  LOCAL_GAMESYNC="/usr/local/lib/gamesync/local_gamesync.py"
+  GAMESYNC_PY="/usr/local/lib/gamesync/gamesync.py"
 else
   GAMESYNC_LOGGING="${HOME}/.local/lib/gamesync/gamesync-logging"
   GAMESYNC_UTILITIES="${HOME}/.local/lib/gamesync/gamesync-utilities"
-  LOCAL_GAMESYNC="${HOME}/.local/lib/gamesync/local_gamesync.py"
+  GAMESYNC_PY="${HOME}/.local/lib/gamesync/gamesync.py"
 fi
 
 # source any dependencies
@@ -68,7 +68,7 @@ fi
 
 log_info "Downloading game saves from the staging area..."
 
-${LOCAL_GAMESYNC} \
+${GAMESYNC_PY} \
   --steamAppId "${SteamAppId}" \
   --executableName "${executableName}" \
   --download
@@ -81,7 +81,7 @@ eval "env LD_PRELOAD=\"${LD_PRELOAD}\" $@"
 
 log_info "done! Staging updated saves for upload..."
 
-${LOCAL_GAMESYNC} \
+${GAMESYNC_PY} \
   --steamAppId "${SteamAppId}" \
   --executableName "${executableName}" \
   --upload

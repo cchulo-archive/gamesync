@@ -44,7 +44,7 @@ elif gamesync_log_level == "FATAL":
 else:
     log_level = logging.INFO
 
-log_format = '%(asctime)s | %(levelname)s | local_gamesync.py | %(message)s'
+log_format = '%(asctime)s | %(levelname)s | gamesync.py | %(message)s'
 
 logging.basicConfig(
     format=log_format,
