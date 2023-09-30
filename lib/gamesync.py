@@ -148,13 +148,14 @@ def main():
 
     steam_app_id = args.steamAppId
     executable_name = args.executableName
-    alias = args.alias
+    alias = None if args.alias == "" else args.alias
     download = args.download
     upload = args.upload
 
     logger.info(f'SteamAppId: {steam_app_id}')
     logger.info(f'Executable name: {executable_name}')
-    logger.info(f'Alias: {alias}')
+    if alias is not None:
+        logger.info(f'Alias: {alias}')
 
     if (download is True and upload is True) or (download is False and upload is False):
         logger.error("Must either specify download or upload, but not both")
