@@ -28,11 +28,22 @@ Note: It's not perfect. It works for me but may not work for you. See the limita
 - Only use this with single player games. *I am not responsible if this tool gets you banned!*
 
 ## Instructions
-Simply wrap `gamesync` around command you wish to launch with quotes
+```
+Usage:
+    gamesync "command"
+    gamesync [options] -- "command"
+
+  Options:
+    -h | --help  )    Displays this dialog
+    -a | --alias )    Used to identify a non-steam game. Useful in case the executable name is not useful
+                      or the command is in a format that is not easily parsable by gamesync
+```
 
 Example:
+- `gamesync --help`
 - `gamesync "%command%"`
 - `gamesync "emulationstation"`
+- `gamesync --alias emu -- emulationstation`
 - `gamesync "gamemoderun %command%"`
 - `gamesync "gamescope -H 1440 -h 1440 -r 60 -f -- gamemoderun %command%"`
 
@@ -125,6 +136,8 @@ See the Syncthing docs for how to enable this in the web UI.
       {
         "steamAppId": 0,
         "executableName": "emulationstation",
+        "directoryName": "emu-dir",
+        "alias": "emu",
         "saveLocations": [
           {
             "name": "retroarch",
@@ -146,6 +159,7 @@ See the Syncthing docs for how to enable this in the web UI.
       },
       {
         "steamAppId": 524220,
+        "directoryName": "nier",
         "saveLocations": [
           {
             "name": "nier",
@@ -165,6 +179,9 @@ See the Syncthing docs for how to enable this in the web UI.
     non-steam games. For non-steam games it is necessary to specify `steamAppId` to be 0.
     - use `executableName` for non-steam games. It could be used for steam games, but executable names tend to be long
     as steam will always feed the fully qualified name into %command%.
+    - use `alias` for non-steam games whenever the executableName is not human-readable or gamesync is unable to parse
+    the executable name because the expression is in a non-standard format
+    - use `directoryName` if you wish to store saves in a directory that is not named after the steamAppId or the executable name
     - `saveLocations` is an array can be used to detail what directories you would like to synchronize across different
     computers
       - `name`: alias that identifies the `saveLocation`. Must be the same across machines
