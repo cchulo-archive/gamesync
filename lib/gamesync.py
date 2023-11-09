@@ -79,6 +79,11 @@ def synchronize_directories(source_dir, dest_dir, include_patterns=None, exclude
                 if matched_exclude:
                     continue
 
+            is_conflict_file = fnmatch.fnmatch(relative_path, '*.sync-conflict*')
+            if is_conflict_file:
+                logger.warning(f'Found conflict file {relative_path}, skipping!')
+                continue
+
             if not os.path.exists(dest_path) or os.path.getmtime(source_path) > os.path.getmtime(dest_path):
                 os.makedirs(os.path.dirname(dest_path), exist_ok=True)  # Create missing directories
                 shutil.copy2(source_path, dest_path)
