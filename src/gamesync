@@ -122,9 +122,11 @@ ${GAMESYNC_PY} \
 
 set +e +o pipefail
 
-log_info "executing game!"
+# workaround, sometimes Steam ROM Manager adds U+00a0 characters in the command string
+exec_string="$(echo "env LD_PRELOAD=\"${LD_PRELOAD}\" $*" | sed 's/\xc2\xa0/ /g')"
+log_info "executing command: ${exec_string}"
 
-eval "env LD_PRELOAD=\"${LD_PRELOAD}\" $@"
+eval "${exec_string}"
 
 log_info "done! Staging updated saves for upload..."
 
