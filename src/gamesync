@@ -117,7 +117,8 @@ log_info "Downloading game saves from the staging area..."
 ${GAMESYNC_PY} \
   --steamAppId "${SteamAppId}" \
   --alias "${alias}" \
-  --download
+  --download \
+  --removeDestConflicts
 
 set +e +o pipefail
 

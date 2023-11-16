@@ -60,7 +60,33 @@ if debug == 'true':
     logger.addHandler(file_handler)
 
 
-def synchronize_directories(source_dir, dest_dir, include_patterns=None, exclude_patterns=None):
+def synchronize_directories(
+        source_dir,
+        dest_dir,
+        include_patterns,
+        exclude_patterns,
+        remove_dest_conflicts):
+    logger.info("checking for files to delete first")
+    for root, dirs, files in os.walk(dest_dir):
+        for filename in files:
+            dest_path = os.path.join(root, filename)
+            relative_path = os.path.relpath(dest_path, dest_dir)
+            source_path = os.path.join(source_dir, relative_path)
+
+            is_conflict_file = fnmatch.fnmatch(dest_path, '*.sync-conflict*')
+            if is_conflict_file:
+                if not remove_dest_conflicts:
+                    logger.warning(f'Found conflict file {dest_path}, skipping!')
+                else:
+                    logger.warning(f'Removing conflict file {dest_path}!')
+                    os.remove(dest_path)
+                continue
+
+            if not os.path.exists(source_path):
+                logger.warning(f'Removing {dest_path}')
+                os.remove(dest_path)
+
+    logger.info("checking for files to sync")
     for root, dirs, files in os.walk(source_dir):
         for filename in files:
             source_path = os.path.join(root, filename)
@@ -79,9 +105,9 @@ def synchronize_directories(source_dir, dest_dir, include_patterns=None, exclude
                 if matched_exclude:
                     continue
 
-            is_conflict_file = fnmatch.fnmatch(relative_path, '*.sync-conflict*')
+            is_conflict_file = fnmatch.fnmatch(source_path, '*.sync-conflict*')
             if is_conflict_file:
-                logger.warning(f'Found conflict file {relative_path}, skipping!')
+                logger.warning(f'Found conflict file {source_path}, skipping!')
                 continue
 
             if not os.path.exists(dest_path) or os.path.getmtime(source_path) > os.path.getmtime(dest_path):
@@ -92,7 +118,7 @@ def synchronize_directories(source_dir, dest_dir, include_patterns=None, exclude
                 logger.debug(f'file {dest_path} already up to date')
 
 
-def synchronize_saves(game, gamesync_folder_name, download):
+def synchronize_saves(game, gamesync_folder_name, download, remove_dest_conflicts):
     gamesync_directory = os.path.expanduser(f'~/.local/share/gamesync/saves/{gamesync_folder_name}')
     save_locations = game['saveLocations']
     for saveLocation in save_locations:
@@ -118,7 +144,7 @@ def synchronize_saves(game, gamesync_folder_name, download):
             destination = gamesync_save_path
 
         logger.info(f'Synchronizing from {source} to {destination}')
-        synchronize_directories(source, destination, include, exclude)
+        synchronize_directories(source, destination, include, exclude, remove_dest_conflicts)
 
 
 def load_game_definition(game_settings, steam_app_id, alias):
@@ -138,16 +164,37 @@ def load_game_definition(game_settings, steam_app_id, alias):
 
 def main():
     parser = argparse.ArgumentParser(description="Synchronize game files for steam or non-steam game")
-    parser.add_argument("--steamAppId", required=True, help="The SteamAppId")
-    parser.add_argument("--alias", required=True, help="Required if the SteamAppId is 0")
-    parser.add_argument("--download", action='store_true', required=False, help="Used to download game saves")
-    parser.add_argument("--upload", action='store_true', required=False, help="Used to upload game saves")
+    parser.add_argument(
+        "--steamAppId",
+        required=True,
+        help="The SteamAppId")
+    parser.add_argument(
+        "--alias",
+        required=True,
+        help="Required if the SteamAppId is 0")
+    parser.add_argument(
+        "--download",
+        action="store_true",
+        required=False,
+        help="Used to download game saves")
+    parser.add_argument(
+        "--upload",
+        action="store_true",
+        required=False,
+        help="Used to upload game saves")
+    parser.add_argument(
+        "--removeDestConflicts",
+        action="store_true",
+        required=False,
+        help="remove conflict files in the destination directory")
+
     args = parser.parse_args()
 
     steam_app_id = args.steamAppId
     alias = args.alias
     download = args.download
     upload = args.upload
+    remove_dest_conflicts = args.removeDestConflicts
 
     if (download is True and upload is True) or (download is False and upload is False):
         logger.error("Must either specify download or upload, but not both")
@@ -186,7 +233,7 @@ def main():
             err_msg += f' was not found in {gamesync_filepath}'
             logger.error(err_msg)
             sys.exit(LOCAL_GAMESYNC_ERR_NO_GAME_DEFINITION)
-        synchronize_saves(game, name, download)
+        synchronize_saves(game, name, download, remove_dest_conflicts)
 
 
 if __name__ == "__main__":
