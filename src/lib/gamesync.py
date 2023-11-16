@@ -67,24 +67,27 @@ def synchronize_directories(
         exclude_patterns,
         remove_dest_conflicts):
     logger.info("checking for files to delete first")
-    for root, dirs, files in os.walk(dest_dir):
-        for filename in files:
-            dest_path = os.path.join(root, filename)
-            relative_path = os.path.relpath(dest_path, dest_dir)
-            source_path = os.path.join(source_dir, relative_path)
+    if os.path.exists(source_dir):
+        for root, dirs, files in os.walk(dest_dir):
+            for filename in files:
+                dest_path = os.path.join(root, filename)
+                relative_path = os.path.relpath(dest_path, dest_dir)
+                source_path = os.path.join(source_dir, relative_path)
 
-            is_conflict_file = fnmatch.fnmatch(dest_path, '*.sync-conflict*')
-            if is_conflict_file:
-                if not remove_dest_conflicts:
-                    logger.warning(f'Found conflict file {dest_path}, skipping!')
-                else:
-                    logger.warning(f'Removing conflict file {dest_path}!')
+                is_conflict_file = fnmatch.fnmatch(dest_path, '*.sync-conflict*')
+                if is_conflict_file:
+                    if not remove_dest_conflicts:
+                        logger.warning(f'Found conflict file {dest_path}, skipping!')
+                    else:
+                        logger.warning(f'Removing conflict file {dest_path}!')
+                        os.remove(dest_path)
+                    continue
+
+                if not os.path.exists(source_path):
+                    logger.warning(f'Removing {dest_path}')
                     os.remove(dest_path)
-                continue
-
-            if not os.path.exists(source_path):
-                logger.warning(f'Removing {dest_path}')
-                os.remove(dest_path)
+    else:
+        logger.info(f'{source_dir} does not exist, might be first-time sync')
 
     logger.info("checking for files to sync")
     for root, dirs, files in os.walk(source_dir):
