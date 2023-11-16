@@ -80,15 +80,10 @@ if [[ -z ${SteamAppId} ]]; then
   SteamAppId="0"
 fi
 
-# extract executable name
-IFS=' ' read -ra commands <<< $@
-executableName="${commands[-1]}"
-
 log_info "Syncing saves before executing $@"
 
 # shellcheck disable=SC2154
 log_info "Steam app id: ${SteamAppId}"
-log_info "Executable name: ${executableName}"
 
 if [[ -n "${alias}" ]]; then
   log_info "Alias name: ${alias}"
@@ -121,7 +116,6 @@ log_info "Downloading game saves from the staging area..."
 
 ${GAMESYNC_PY} \
   --steamAppId "${SteamAppId}" \
-  --executableName "${executableName}" \
   --alias "${alias}" \
   --download
 
@@ -135,6 +129,5 @@ log_info "done! Staging updated saves for upload..."
 
 ${GAMESYNC_PY} \
   --steamAppId "${SteamAppId}" \
-  --executableName "${executableName}" \
   --alias "${alias}" \
   --upload

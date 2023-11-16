@@ -30,8 +30,7 @@ Note: It's not perfect. It works for me but may not work for you. See the limita
 ## Instructions
 ```
 Usage:
-    gamesync "command"
-    gamesync [options] -- "command"
+    gamesync [options] -- <command>
 
   Options:
     -h | --help  )    Displays this dialog
@@ -40,12 +39,18 @@ Usage:
 ```
 
 Example:
-- `gamesync --help`
-- `gamesync "%command%"`
-- `gamesync "emulationstation"`
-- `gamesync --alias emu -- emulationstation`
-- `gamesync "gamemoderun %command%"`
-- `gamesync --alias my-alias "gamescope -H 1440 -h 1440 -r 60 -f -- gamemoderun %command%"`
+```bash
+gamesync --help
+
+# for steam games
+gamesync -- %command%
+gamesync -- gamemoderun %command%
+
+# for non-steam games
+gamesync --alias emu -- emulationstation
+gamesync --alias my-alias -- gamescope -H 1440 -h 1440 -r 60 -f -- gamemoderun %command%
+```
+
 
 ### Note for the Steam Deck
 Even though ~/.local/bin is in the PATH, in gamemode it is unable to find `gamesync`, so please add launch options for
@@ -137,7 +142,6 @@ See the Syncthing docs for how to enable this in the web UI.
     "games": [
       {
         "steamAppId": 0,
-        "executableName": "emulationstation",
         "directoryName": "emu-dir",
         "alias": "emu",
         "saveLocations": [
@@ -176,13 +180,10 @@ See the Syncthing docs for how to enable this in the web UI.
   }
   ```
   - `games` array holds the list of all game definitions
-    - Each game has `steamAppId` and/or `executableName`
+    - Each game has `steamAppId` and/or `alias`
     - `steamAppId` is what Steam uses to identify what game is running. It will be non-zero for steam games, 0 for
     non-steam games. For non-steam games it is necessary to specify `steamAppId` to be 0.
-    - use `executableName` for non-steam games. It could be used for steam games, but executable names tend to be long
-    as steam will always feed the fully qualified name into %command%.
-    - use `alias` for non-steam games whenever the executableName is not human-readable or gamesync is unable to parse
-    the executable name because the expression is in a non-standard format
+    - use `alias` for non-steam games
     - use `directoryName` if you wish to store saves in a directory that is not named after the steamAppId or the executable name
     - `saveLocations` is an array can be used to detail what directories you would like to synchronize across different
     computers
