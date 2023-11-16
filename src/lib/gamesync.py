@@ -139,7 +139,7 @@ def load_game_definition(game_settings, steam_app_id, alias):
 def main():
     parser = argparse.ArgumentParser(description="Synchronize game files for steam or non-steam game")
     parser.add_argument("--steamAppId", required=True, help="The SteamAppId")
-    parser.add_argument("--alias", required=True, help="Used if SteamAppId is 0 and the executableName is unusable")
+    parser.add_argument("--alias", required=True, help="Required if the SteamAppId is 0")
     parser.add_argument("--download", action='store_true', required=False, help="Used to download game saves")
     parser.add_argument("--upload", action='store_true', required=False, help="Used to upload game saves")
     args = parser.parse_args()

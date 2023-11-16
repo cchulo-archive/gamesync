@@ -19,12 +19,12 @@ else
 fi
 
 echo 'Installing gamesync'
-${PERMISSION} cp gamesync ${BASE_BIN}
-${PERMISSION} cp gamesync-update-settings ${BASE_BIN}
+${PERMISSION} cp src/gamesync ${BASE_BIN}
+${PERMISSION} cp src/gamesync-update-settings ${BASE_BIN}
 
 echo "Creating folders in ${BASE_LIB}"
 ${PERMISSION} mkdir -p ${BASE_LIB}/gamesync
-${PERMISSION} cp lib/* ${BASE_LIB}/gamesync/
+${PERMISSION} cp src/lib/* ${BASE_LIB}/gamesync/
 
 echo "Creating folders in ~/.local/share/gamesync"
 mkdir -p ~/.local/share/gamesync/logs
@@ -35,7 +35,7 @@ if [[ ! -f ~/.local/share/gamesync/gamesync-settings.json ]]; then
   echo '[]' > ~/.local/share/gamesync/gamesync-settings.json
 fi
 
-cp .default-settings.json ~/.local/share/gamesync/
+cp src/.default-settings.json ~/.local/share/gamesync/
 
 if [[ ! -f ~/.local/share/gamesync/gamesync.env ]]; then
   echo "Creating ~/.local/share/gamesync/gamesync.env, be sure to populate this file!"
