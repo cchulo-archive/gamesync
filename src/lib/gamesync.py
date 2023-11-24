@@ -87,7 +87,8 @@ def synchronize_directories(
                     logger.warning(f'Removing {dest_path}')
                     os.remove(dest_path)
     else:
-        logger.info(f'{source_dir} does not exist, might be first-time sync')
+        logger.info(f'{source_dir} does not exist, might be first-time sync, skipping sync this time!')
+        return
 
     logger.info("checking for files to sync")
     for root, dirs, files in os.walk(source_dir):
