@@ -82,17 +82,8 @@ def synchronize_directories(
                 relative_path = os.path.relpath(source_path, source_dir)
                 dest_path = os.path.join(dest_dir, relative_path)
 
-                if include_patterns:
-                    logger.debug(f'Testing if {filename} is in include_patterns: {include_patterns}')
-                    matched_include = any(fnmatch.fnmatch(filename, pattern) for pattern in include_patterns)
-                    if not matched_include:
-                        continue
-
-                if exclude_patterns:
-                    logger.debug(f'Testing if {filename} is in exclude_patterns: {include_patterns}')
-                    matched_exclude = any(fnmatch.fnmatch(filename, pattern) for pattern in exclude_patterns)
-                    if matched_exclude:
-                        continue
+                if should_skip(filename, include_patterns, exclude_patterns):
+                    continue
 
                 is_conflict_file = fnmatch.fnmatch(filename, '*.sync-conflict*')
                 if is_conflict_file:
@@ -108,6 +99,8 @@ def synchronize_directories(
         logger.info(f'checking for files to delete from {dest_dir} not present in {source_dir}')
         for dest_root, dest_dirs, dest_files in os.walk(dest_dir):
             for filename in dest_files:
+                if should_skip(filename, include_patterns, exclude_patterns):
+                    continue
                 file_to_delete = os.path.join(dest_root, filename)
                 relative_path = os.path.relpath(file_to_delete, dest_dir)
                 path_to_check = os.path.join(source_dir, relative_path)
@@ -121,6 +114,22 @@ def synchronize_directories(
                         logger.error(f'Could not remove {file_to_delete}')
     else:
         logger.info(f'{source_dir} does not exist, this may be first time sync')
+
+
+def should_skip(filename, include_patterns, exclude_patterns):
+    if include_patterns:
+        logger.debug(f'Testing if {filename} is in include_patterns: {include_patterns}')
+        matched_include = any(fnmatch.fnmatch(filename, pattern) for pattern in include_patterns)
+        if not matched_include:
+            return True
+
+    if exclude_patterns:
+        logger.debug(f'Testing if {filename} is in exclude_patterns: {include_patterns}')
+        matched_exclude = any(fnmatch.fnmatch(filename, pattern) for pattern in exclude_patterns)
+        if matched_exclude:
+            return True
+
+    return False
 
 
 def synchronize_saves(game, gamesync_folder_name, download, remove_dest_conflicts):
