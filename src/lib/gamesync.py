@@ -137,11 +137,15 @@ def synchronize_saves(game, gamesync_folder_name, download, remove_dest_conflict
         logger.debug(f'Include {include}')
         logger.debug(f'Exclude {exclude}')
 
+        first_time_sync = False
         gamesync_save_path = os.path.join(gamesync_directory, save_location_name)
         if not os.path.exists(gamesync_save_path):
             os.makedirs(gamesync_save_path)
+            first_time_sync = True
 
         if download:
+            if first_time_sync:
+                logger.info(f'First time synchronization, nothing to download!')
             source = gamesync_save_path
             destination = source_directory
         else:
