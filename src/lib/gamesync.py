@@ -66,60 +66,61 @@ def synchronize_directories(
         include_patterns,
         exclude_patterns,
         remove_dest_conflicts):
-    logger.info("checking for files to delete first")
     if os.path.exists(source_dir):
-        for root, dirs, files in os.walk(dest_dir):
+        logger.info(f'checking for files to sync in {source_dir} to {dest_dir}')
+        for root, dirs, files in os.walk(source_dir):
+            for directory in dirs:
+                synchronize_directories(
+                    os.path.join(source_dir, directory),
+                    os.path.join(dest_dir, directory),
+                    include_patterns,
+                    exclude_patterns,
+                    remove_dest_conflicts)
+
             for filename in files:
-                dest_path = os.path.join(root, filename)
-                relative_path = os.path.relpath(dest_path, dest_dir)
-                source_path = os.path.join(source_dir, relative_path)
+                source_path = os.path.join(root, filename)
+                relative_path = os.path.relpath(source_path, source_dir)
+                dest_path = os.path.join(dest_dir, relative_path)
 
-                is_conflict_file = fnmatch.fnmatch(dest_path, '*.sync-conflict*')
+                if include_patterns:
+                    logger.debug(f'Testing if {filename} is in include_patterns: {include_patterns}')
+                    matched_include = any(fnmatch.fnmatch(filename, pattern) for pattern in include_patterns)
+                    if not matched_include:
+                        continue
+
+                if exclude_patterns:
+                    logger.debug(f'Testing if {filename} is in exclude_patterns: {include_patterns}')
+                    matched_exclude = any(fnmatch.fnmatch(filename, pattern) for pattern in exclude_patterns)
+                    if matched_exclude:
+                        continue
+
+                is_conflict_file = fnmatch.fnmatch(filename, '*.sync-conflict*')
                 if is_conflict_file:
-                    if not remove_dest_conflicts:
-                        logger.warning(f'Found conflict file {dest_path}, skipping!')
-                    else:
-                        logger.warning(f'Removing conflict file {dest_path}!')
-                        os.remove(dest_path)
+                    logger.warning(f'Found conflict file {source_path}, skipping!')
                     continue
 
-                if not os.path.exists(source_path):
-                    logger.warning(f'Removing {dest_path}')
-                    os.remove(dest_path)
+                if not os.path.exists(dest_path) or os.path.getmtime(source_path) > os.path.getmtime(dest_path):
+                    os.makedirs(os.path.dirname(dest_path), exist_ok=True)  # Create missing directories
+                    shutil.copy2(source_path, dest_path)
+                    logger.info(f"Copied {source_path} to {dest_path}")
+                else:
+                    logger.debug(f'file {dest_path} already up to date')
+        logger.info(f'checking for files to delete from {dest_dir} not present in {source_dir}')
+        for dest_root, dest_dirs, dest_files in os.walk(dest_dir):
+            for filename in dest_files:
+                file_to_delete = os.path.join(dest_root, filename)
+                relative_path = os.path.relpath(file_to_delete, dest_dir)
+                path_to_check = os.path.join(source_dir, relative_path)
+                if not os.path.exists(path_to_check):
+                    try:
+                        logger.warning(f'{file_to_delete} marked for deletion')
+                        os.remove(file_to_delete)
+                        logger.info(f'deleted {file_to_delete} successfully')
+                    except OSError as error:
+                        logger.error(error)
+                        logger.error(f'Could not remove {file_to_delete}')
     else:
-        logger.info(f'{source_dir} does not exist, might be first-time sync, skipping sync this time!')
-        return
-
-    logger.info("checking for files to sync")
-    for root, dirs, files in os.walk(source_dir):
-        for filename in files:
-            source_path = os.path.join(root, filename)
-            relative_path = os.path.relpath(source_path, source_dir)
-            dest_path = os.path.join(dest_dir, relative_path)
-
-            if include_patterns:
-                logger.debug(f'Testing if {relative_path} is in include_patterns: {include_patterns}')
-                matched_include = any(fnmatch.fnmatch(relative_path, pattern) for pattern in include_patterns)
-                if not matched_include:
-                    continue
-
-            if exclude_patterns:
-                logger.debug(f'Testing if {relative_path} is in exclude_patterns: {include_patterns}')
-                matched_exclude = any(fnmatch.fnmatch(relative_path, pattern) for pattern in exclude_patterns)
-                if matched_exclude:
-                    continue
-
-            is_conflict_file = fnmatch.fnmatch(source_path, '*.sync-conflict*')
-            if is_conflict_file:
-                logger.warning(f'Found conflict file {source_path}, skipping!')
-                continue
-
-            if not os.path.exists(dest_path) or os.path.getmtime(source_path) > os.path.getmtime(dest_path):
-                os.makedirs(os.path.dirname(dest_path), exist_ok=True)  # Create missing directories
-                shutil.copy2(source_path, dest_path)
-                logger.info(f"Copied {source_path} to {dest_path}")
-            else:
-                logger.debug(f'file {dest_path} already up to date')
+        logger.info(f'{source_dir} does not exist, this may be first time sync')
 
 
 def synchronize_saves(game, gamesync_folder_name, download, remove_dest_conflicts):
