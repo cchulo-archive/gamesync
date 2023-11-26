@@ -101,6 +101,7 @@ def synchronize_directories(
             for filename in dest_files:
                 if should_skip(filename, include_patterns, exclude_patterns):
                     continue
+
                 file_to_delete = os.path.join(dest_root, filename)
                 relative_path = os.path.relpath(file_to_delete, dest_dir)
                 path_to_check = os.path.join(source_dir, relative_path)
