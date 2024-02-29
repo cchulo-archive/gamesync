@@ -1,5 +1,7 @@
 # GameSync
 
+## This repo is now archived, development will be moved to [conductor](https://github.com/cchulo/conductor)
+
 ## Description
 
 Steam cloud unfortunately synchronizes graphics settings for some games, making it awkward to switch from 
